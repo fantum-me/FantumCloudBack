@@ -210,6 +210,11 @@ class Workspace extends AbstractUid
         return $this->roles;
     }
 
+    public function getDefaultRole(): Role
+    {
+        return $this->roles->filter(fn (Role $role) => $role->isDefault())->first();
+    }
+
     public function addRole(Role $role): static
     {
         if (!$this->roles->contains($role)) {

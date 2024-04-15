@@ -22,7 +22,7 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class ModifyMembersController extends AbstractController
 {
-    #[Route('/api/workspaces/{workspace_id}/members/{id}', name: 'api_workspaces_members_modify', methods: 'POST')]
+    #[Route('/api/workspaces/{workspace_id}/members/{id}', name: 'api_workspaces_members_modify', methods: 'PATCH')]
     public function modify(
         Request                                    $request,
         #[MapEntity(id: 'workspace_id')] Workspace $workspace,
@@ -39,19 +39,27 @@ class ModifyMembersController extends AbstractController
         $permissionService->assertAccess($user, $workspace);
         $permissionService->hasWorkspacePermission($user, Permission::EDIT_PERMISSIONS, $workspace);
         $member = $user->getWorkspaceMember($workspace);
-        $roleIds = RequestHandler::getRequestParameter($request, "roles", true);
 
-        foreach ($workspace->getRoles() as $role) {
-            if ($role->isDefault()) continue;
-            if (!in_array($role->getId(), $roleIds) && in_array($role, $targetMember->getRoles()->toArray())) {
-                if ($member->isOwner() || $member->getRoles()[0]->getPosition() > $role->getPosition()) {
-                    $targetMember->removeRole($role);
-                } else throw new AccessDeniedHttpException("could not remove role " . $role->getId());
-            } elseif (in_array($role->getId(), $roleIds) && !in_array($role, $targetMember->getRoles()->toArray())) {
-                if ($member->isOwner() || $member->getRoles()[0]->getPosition() > $role->getPosition()) {
-                    $targetMember->addRole($role);
-                } else throw new AccessDeniedHttpException("could not add role " . $role->getId());
+        $roleIds = RequestHandler::getRequestParameter($request, "roles");
+        if ($roleIds) {
+            foreach ($workspace->getRoles() as $role) {
+                if ($role->isDefault()) continue;
+                if (!in_array($role->getId(), $roleIds) && in_array($role, $targetMember->getRoles()->toArray())) {
+                    if ($member->isOwner() || $member->getRoles()[0]->getPosition() > $role->getPosition()) {
+                        $targetMember->removeRole($role);
+                    } else throw new AccessDeniedHttpException("could not remove role " . $role->getId());
+                } elseif (in_array($role->getId(), $roleIds) && !in_array($role, $targetMember->getRoles()->toArray())) {
+                    if ($member->isOwner() || $member->getRoles()[0]->getPosition() > $role->getPosition()) {
+                        $targetMember->addRole($role);
+                    } else throw new AccessDeniedHttpException("could not add role " . $role->getId());
+                }
             }
+        }
+
+        $isOwner = RequestHandler::getRequestParameter($request, "is_owner");
+        if ($isOwner && $member->isOwner()) {
+            $targetMember->setIsOwner(true);
+            $member->setIsOwner(false);
         }
 
         $entityManager->flush();

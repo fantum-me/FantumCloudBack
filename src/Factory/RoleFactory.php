@@ -12,26 +12,25 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class RoleFactory
 {
     public function __construct(
-        private readonly RolePositionService    $rolePositionService,
+        private readonly RolePositionService $rolePositionService,
         private readonly EntityManagerInterface $entityManager,
-        private readonly ValidatorInterface     $validator
-    )
-    {
+        private readonly ValidatorInterface $validator
+    ) {
     }
 
     public function createRole(
-        string    $name,
-        int       $position,
+        string $name,
+        int $position,
         Workspace $workspace,
-        array     $permissions,
-        bool      $isDefault = false
-    ): Role
-    {
+        array $permissions,
+        bool $isDefault = false
+    ): Role {
         $role = new Role();
 
         $role->setName($name)
-            ->setWorkspace($workspace)
             ->setIsDefault($isDefault);
+
+        $workspace->addRole($role);
 
         foreach ($permissions as $permission => $value) {
             $role->setPermission($permission, $value);

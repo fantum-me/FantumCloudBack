@@ -21,7 +21,8 @@ class WorkspaceObjectService
         $object = [
             "id" => $workspace->getId(),
             "name" => $workspace->getName(),
-            "owner" => $workspace->getOwner()->getUser()->getId(),
+            "owner" => $workspace->getOwner()->getUser() === $this->security->getUser(),
+            "owner_id" => $workspace->getOwner()->getUser()->getId(),
             "root" => $workspace->getRootFolder()->getId(),
             "member_count" => sizeof($workspace->getMembers()),
             "used_space" => FileSizeService::getFolderSize($this->workspacePath . "/" . $workspace->getId()),

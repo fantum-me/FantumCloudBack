@@ -4,6 +4,7 @@ namespace App\Controller\Api\Workspace;
 
 use App\Entity\Member;
 use App\Entity\User;
+use App\Factory\MemberFactory;
 use App\Repository\InviteRepository;
 use App\Service\ObjectMaker\WorkspaceObjectService;
 use App\Utils\RequestHandler;
@@ -19,23 +20,23 @@ class JoinWorkspaceController extends AbstractController
 {
     #[Route("/api/workspaces/join", name: "api_workspaces_join", methods: "POST")]
     public function join(
-        Request                $request,
-        #[CurrentUser] User    $user,
-        InviteRepository       $inviteCodeRepository,
+        Request $request,
+        #[CurrentUser] User $user,
+        InviteRepository $inviteCodeRepository,
+        MemberFactory $memberFactory,
         EntityManagerInterface $entityManager,
         WorkspaceObjectService $workspaceObjectService
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $code = RequestHandler::getRequestParameter($request, "code", true);
         $invite = $inviteCodeRepository->findOneBy(["code" => $code]);
-        if (!$invite) throw new BadRequestHttpException("code is invalid");
+        if (!$invite) {
+            throw new BadRequestHttpException("code is invalid");
+        }
 
-        $member = new Member();
-        $member->setUser($user)->setWorkspace($invite->getWorkspace());
-
-        $entityManager->persist($member);
+        $workspace = $invite->getWorkspace();
+        $memberFactory->getOrCreateMember($user, $workspace);
         $entityManager->flush();
 
-        return $this->json($workspaceObjectService->getWorkspaceObject($invite->getWorkspace()));
+        return $this->json($workspaceObjectService->getWorkspaceObject($workspace));
     }
 }

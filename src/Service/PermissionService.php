@@ -50,6 +50,9 @@ class PermissionService
     public function hasWorkspacePermission(UserInterface $user, string $permission, Workspace $workspace): bool
     {
         $member = $user->getWorkspaceMember($workspace);
+        if (!$member) {
+            return false;
+        }
         if ($workspace->getOwner() === $member) {
             return true;
         }
@@ -65,9 +68,13 @@ class PermissionService
     public function assertPermission(UserInterface $user, string $permission, StorageItemInterface $item): void
     {
         if (!PermissionService::hasItemPermission($user, $permission, $item)) {
-            $className = EntityTypeMapper::getNameFromClass($item::class);
             throw new AccessDeniedHttpException(
-                "you don't have permission to read " . $className . " " . $item->getId()
+                sprintf(
+                    "You don't have permission to %s %s %s",
+                    strtolower($permission),
+                    EntityTypeMapper::getNameFromClass($item::class),
+                    $item->getId()
+                )
             );
         }
     }
@@ -76,7 +83,7 @@ class PermissionService
     {
         if (!$user->isInWorkspace($workspace)) {
             throw new AccessDeniedHttpException(
-                "you don't have access to workspace " . $workspace->getId()
+                sprintf("You don't have access to workspace %s", $workspace->getId())
             );
         }
     }
