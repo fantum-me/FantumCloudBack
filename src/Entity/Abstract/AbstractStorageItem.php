@@ -6,6 +6,7 @@ use App\Entity\Interface\StorageItemInterface;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 abstract class AbstractStorageItem extends AbstractUid implements StorageItemInterface
@@ -14,13 +15,16 @@ abstract class AbstractStorageItem extends AbstractUid implements StorageItemInt
     #[Assert\NotBlank]
     #[Assert\Length(max: 127)]
     #[Assert\NoSuspiciousCharacters]
+    #[Groups(["default"])]
     protected ?string $name = null;
 
     #[ORM\Column]
+    #[Groups(["default"])]
     protected bool $inTrash = false;
 
     #[ORM\Column]
     #[Assert\PositiveOrZero]
+    #[Groups(["default"])]
     protected int $version = 0;
 
     #[ORM\Column(type: 'datetime', nullable: true)]

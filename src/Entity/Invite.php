@@ -8,6 +8,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: InviteRepository::class)]
@@ -15,17 +17,21 @@ use Symfony\Component\Uid\Uuid;
 class Invite extends AbstractUid
 {
     #[ORM\Column(length: 255, unique: true)]
+    #[Groups(["default"])]
     private string $code;
 
     #[ORM\ManyToOne(inversedBy: 'invites')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Ignore]
     private ?Workspace $workspace = null;
 
     #[ORM\ManyToMany(targetEntity: User::class)]
+    #[Ignore]
     private Collection $users;
 
     #[ORM\ManyToOne(inversedBy: 'invites')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["default"])]
     private ?Member $createdBy = null;
 
     public function __construct()
@@ -79,5 +85,10 @@ class Invite extends AbstractUid
         $this->createdBy = $createdBy;
 
         return $this;
+    }
+
+    public function getUseCount(): int
+    {
+        return $this->users->count();
     }
 }

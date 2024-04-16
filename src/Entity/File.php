@@ -9,6 +9,9 @@ use App\Service\StorageItem\FilePreviewService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\Ignore;
+use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: FileRepository::class)]
@@ -18,20 +21,26 @@ class File extends AbstractStorageItem
     use TimestampTrait;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["file_details"])]
     private ?string $ext = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\Regex("^[a-zA-Z]+\/[a-zA-Z0-9\-\.\+]+$^")]
+    #[SerializedName("mime")]
+    #[Groups(["file_details"])]
     private ?string $type = null;
 
     #[ORM\ManyToOne(inversedBy: 'files')]
+    #[Ignore]
     private ?Folder $folder = null;
 
     #[ORM\ManyToOne(inversedBy: 'files')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Ignore]
     private ?Workspace $workspace = null;
 
     #[ORM\OneToMany(mappedBy: 'file', targetEntity: AccessControl::class)]
+    #[Groups(["file_details"])]
     private Collection $accessControls;
 
     public function __construct()
@@ -47,7 +56,8 @@ class File extends AbstractStorageItem
 
     public function getPreviewPath(): ?string
     {
-        return $this->folder->getPath() . "/preview-" . $this->getSystemFileName() . "." . FilePreviewService::PREVIEW_FORMAT;
+        return $this->folder->getPath() . "/preview-" . $this->getSystemFileName(
+            ) . "." . FilePreviewService::PREVIEW_FORMAT;
     }
 
     public function getExt(): ?string

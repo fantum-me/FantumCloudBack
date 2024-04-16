@@ -6,6 +6,7 @@ use App\Entity\Abstract\AbstractPermissionManager;
 use App\Entity\Interface\StorageItemInterface;
 use App\Repository\AccessControlRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity(repositoryClass: AccessControlRepository::class)]
 class AccessControl extends AbstractPermissionManager
@@ -15,9 +16,11 @@ class AccessControl extends AbstractPermissionManager
     private ?Role $role = null;
 
     #[ORM\ManyToOne(inversedBy: 'accessControls')]
+    #[Ignore]
     private ?File $file = null;
 
     #[ORM\ManyToOne(inversedBy: 'accessControls')]
+    #[Ignore]
     private ?Folder $folder = null;
 
     public function getRole(): ?Role
@@ -32,6 +35,7 @@ class AccessControl extends AbstractPermissionManager
         return $this;
     }
 
+    #[Ignore]
     public function getItem(): StorageItemInterface
     {
         return $this->folder ?? $this->file;

@@ -8,37 +8,47 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: WorkspaceRepository::class)]
 class Workspace extends AbstractUid
 {
     #[ORM\OneToMany(mappedBy: 'workspace', targetEntity: File::class, orphanRemoval: true)]
+    #[Ignore]
     private Collection $files;
 
+    #[Ignore]
     #[ORM\OneToMany(mappedBy: 'workspace', targetEntity: Folder::class, orphanRemoval: true)]
     private Collection $folders;
 
+    #[Ignore]
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?Folder $rootFolder = null;
 
     #[ORM\Column(length: 31)]
     #[Assert\Length(min: 3, max: 31)]
     #[Assert\NoSuspiciousCharacters]
+    #[Groups(["default"])]
     private ?string $name = null;
 
+    #[Ignore]
     #[ORM\OneToMany(mappedBy: 'workspace', targetEntity: Invite::class, orphanRemoval: true)]
     private Collection $invites;
 
+    #[Ignore]
     #[ORM\OneToMany(mappedBy: 'workspace', targetEntity: Member::class)]
     private Collection $members;
 
     #[ORM\OneToMany(mappedBy: 'workspace', targetEntity: Role::class, orphanRemoval: true)]
     #[ORM\OrderBy(["position" => "DESC"])]
+    #[Groups(["workspace_details"])]
     private Collection $roles;
 
     #[ORM\Column(type: Types::BIGINT, nullable: true)]
     #[Assert\PositiveOrZero]
+    #[Groups(['workspace_details'])]
     private ?int $quota = null;
 
     public function __construct()
@@ -196,9 +206,20 @@ class Workspace extends AbstractUid
         return $this;
     }
 
+    #[Groups(["default"])]
+    public function getMemberCount(): int
+    {
+        return $this->members->count();
+    }
+
+    #[Ignore]
     public function getOwner(): ?Member
     {
-        foreach ($this->getMembers() as $member) if ($member->isOwner()) return $member;
+        foreach ($this->getMembers() as $member) {
+            if ($member->isOwner()) {
+                return $member;
+            }
+        }
         return null;
     }
 
@@ -210,9 +231,10 @@ class Workspace extends AbstractUid
         return $this->roles;
     }
 
+    #[Ignore]
     public function getDefaultRole(): Role
     {
-        return $this->roles->filter(fn (Role $role) => $role->isDefault())->first();
+        return $this->roles->filter(fn(Role $role) => $role->isDefault())->first();
     }
 
     public function addRole(Role $role): static

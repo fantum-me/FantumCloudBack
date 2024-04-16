@@ -4,7 +4,6 @@ namespace App\Controller\Api\Workspace;
 
 use App\Entity\User;
 use App\Entity\Workspace;
-use App\Service\ObjectMaker\StorageItemObjectService;
 use App\Service\PermissionService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,25 +14,31 @@ class GetWorkspaceTrashController extends AbstractController
 {
     #[Route('/api/workspaces/{id}/trash', name: 'api_workspaces_trash', methods: "GET")]
     public function trash(
-        Workspace                $workspace,
-        #[CurrentUser] User      $user,
-        StorageItemObjectService $objectService,
+        Workspace $workspace,
+        #[CurrentUser] User $user,
         PermissionService $permissionService
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $permissionService->assertAccess($user, $workspace);
 
         [$files, $folders] = [[], []];
-        foreach ($workspace->getFiles() as $f) if ($f->isInTrash()) $files[] = $f;
-        foreach ($workspace->getFolders() as $f) if ($f->isInTrash()) $folders[] = $f;
+        foreach ($workspace->getFiles() as $f) {
+            if ($f->isInTrash()) {
+                $files[] = $f;
+            }
+        }
+        foreach ($workspace->getFolders() as $f) {
+            if ($f->isInTrash()) {
+                $folders[] = $f;
+            }
+        }
 
         $res = [
-            "folders" => [],
-            "files" => []
+            "files" => $files,
+            "folders" => $folders
         ];
-        foreach ($files as $file) $res["files"][] = $objectService->getFileObject($file);
-        foreach ($folders as $folder) $res["folders"][] = $objectService->getFolderObject($folder, false);
 
-        return $this->json($res);
+        return $this->json($res, 200, [], [
+            "groups" => ["default", "file_details", "folder_details", "folder_parents"]
+        ]);
     }
 }

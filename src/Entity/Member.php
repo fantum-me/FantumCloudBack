@@ -4,29 +4,38 @@ namespace App\Entity;
 
 use App\Entity\Abstract\AbstractUid;
 use App\Repository\MemberRepository;
+use App\Utils\ArrayCollectionIndexHandler;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\Ignore;
+use Symfony\Component\Serializer\Attribute\SerializedName;
 
 #[ORM\Entity(repositoryClass: MemberRepository::class)]
 class Member extends AbstractUid
 {
     #[ORM\ManyToOne(inversedBy: 'relatedMembers')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["default"])]
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'members')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Ignore]
     private ?Workspace $workspace = null;
 
     #[ORM\OneToMany(mappedBy: 'member', targetEntity: Invite::class, orphanRemoval: true)]
+    #[Ignore]
     private Collection $invites;
 
     #[ORM\Column]
+    #[Groups(["default"])]
     private bool $isOwner = false;
 
     #[ORM\ManyToMany(targetEntity: Role::class, inversedBy: 'members')]
     #[ORM\OrderBy(["position" => "DESC"])]
+    #[Groups(["default"])]
     private Collection $roles;
 
     public function __construct()
@@ -122,6 +131,9 @@ class Member extends AbstractUid
     public function removeRole(Role $role): static
     {
         $this->roles->removeElement($role);
+
+        // To prevent serialization error, we need to re-index the collection
+        $this->roles = ArrayCollectionIndexHandler::getNewIndexedArrayCollection($this->roles);
 
         return $this;
     }

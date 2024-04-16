@@ -8,6 +8,8 @@ use App\Repository\FolderRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity(repositoryClass: FolderRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -16,16 +18,20 @@ class Folder extends AbstractStorageItem
     use TimestampTrait;
 
     #[ORM\OneToMany(mappedBy: 'folder', targetEntity: File::class, orphanRemoval: true)]
+    #[Ignore]
     private Collection $files;
 
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'folders')]
+    #[Ignore]
     private ?self $folder = null;
 
     #[ORM\OneToMany(mappedBy: 'folder', targetEntity: self::class)]
+    #[Ignore]
     private Collection $folders;
 
     #[ORM\ManyToOne(inversedBy: 'folders')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Ignore]
     private ?Workspace $workspace = null;
 
     #[ORM\OneToMany(mappedBy: 'folder', targetEntity: AccessControl::class)]

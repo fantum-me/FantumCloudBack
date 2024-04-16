@@ -2,11 +2,9 @@
 
 namespace App\Controller\Api\Workspace;
 
-use App\Entity\Member;
 use App\Entity\User;
 use App\Factory\MemberFactory;
 use App\Repository\InviteRepository;
-use App\Service\ObjectMaker\WorkspaceObjectService;
 use App\Utils\RequestHandler;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,8 +22,7 @@ class JoinWorkspaceController extends AbstractController
         #[CurrentUser] User $user,
         InviteRepository $inviteCodeRepository,
         MemberFactory $memberFactory,
-        EntityManagerInterface $entityManager,
-        WorkspaceObjectService $workspaceObjectService
+        EntityManagerInterface $entityManager
     ): JsonResponse {
         $code = RequestHandler::getRequestParameter($request, "code", true);
         $invite = $inviteCodeRepository->findOneBy(["code" => $code]);
@@ -37,6 +34,6 @@ class JoinWorkspaceController extends AbstractController
         $memberFactory->getOrCreateMember($user, $workspace);
         $entityManager->flush();
 
-        return $this->json($workspaceObjectService->getWorkspaceObject($workspace));
+        return $this->json($workspace);
     }
 }

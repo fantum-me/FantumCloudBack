@@ -6,7 +6,6 @@ use App\Entity\Folder;
 use App\Entity\User;
 use App\Factory\FileFactory;
 use App\Security\Permission;
-use App\Service\ObjectMaker\StorageItemObjectService;
 use App\Service\PermissionService;
 use App\Service\StorageItem\StorageItemService;
 use App\Utils\RequestHandler;
@@ -25,7 +24,6 @@ class InsertFileController extends AbstractController
         #[CurrentUser] User $user,
         FileFactory $fileFactory,
         StorageItemService $storageItemService,
-        StorageItemObjectService $storageItemObjectService,
         PermissionService $permissionService,
         EntityManagerInterface $entityManager
     ): JsonResponse {
@@ -40,6 +38,8 @@ class InsertFileController extends AbstractController
         $file = $fileFactory->createFile($name, $ext, $mime, $parent);
         $entityManager->flush();
 
-        return $this->json($storageItemObjectService->getFileObject($file));
+        return $this->json($file, 200, [], [
+            "groups" => ["default", "file_details"]
+        ]);
     }
 }

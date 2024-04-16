@@ -7,6 +7,8 @@ use App\Repository\RoleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: RoleRepository::class)]
@@ -16,27 +18,34 @@ class Role extends AbstractPermissionManager
     #[Assert\NotBlank]
     #[Assert\Length(max: 31)]
     #[Assert\NoSuspiciousCharacters]
+    #[Groups(["default"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\CssColor(Assert\CssColor::HEX_LONG)]
+    #[Groups(["default"])]
     private ?string $color = null;
 
+    #[Ignore]
     #[ORM\ManyToOne(inversedBy: 'roles')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Workspace $workspace = null;
 
+    #[Ignore]
     #[ORM\OneToMany(mappedBy: 'role', targetEntity: AccessControl::class, orphanRemoval: true)]
     private Collection $accessControls;
 
+    #[Ignore]
     #[ORM\ManyToMany(targetEntity: Member::class, mappedBy: 'roles')]
     private Collection $members;
 
     #[ORM\Column]
+    #[Groups(["default"])]
     private bool $isDefault = false;
 
     #[ORM\Column]
     #[Assert\PositiveOrZero]
+    #[Groups(["default"])]
     private ?int $position = null;
 
     public function __construct()

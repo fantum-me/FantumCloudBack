@@ -4,6 +4,7 @@ namespace App\Entity\Abstract;
 
 use App\Entity\Interface\UidInterface;
 use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Uid\Uuid;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -11,6 +12,7 @@ abstract class AbstractUid implements UidInterface
 {
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[Groups(["default"])]
     protected Uuid $id;
 
     public function __construct()

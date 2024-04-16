@@ -14,8 +14,8 @@ use App\Utils\EntityTypeMapper;
 use App\Utils\RequestHandler;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
@@ -24,19 +24,26 @@ class ModifyStorageItemController extends AbstractController
 {
     #[Route('/api/storage-items', name: 'api_storage_items_modify', methods: "PATCH")]
     public function modify(
-        Request                $request,
-        #[CurrentUser] User    $user,
-        StorageItemService     $storageItemService,
+        Request $request,
+        #[CurrentUser] User $user,
+        StorageItemService $storageItemService,
         EntityManagerInterface $entityManager,
         StorageItemMoveService $moveService,
-        PermissionService      $permissionService
-    ): Response
-    {
+        PermissionService $permissionService
+    ): JsonResponse {
         [$files, $folders] = RequestHandler::getTwoRequestParameters($request, "files", "folders");
         $items = [];
 
-        if ($files) foreach ($files as $id) $items[] = $storageItemService->getStorageItem(File::class, $id);
-        if ($folders) foreach ($folders as $id) $items[] = $storageItemService->getStorageItem(Folder::class, $id);
+        if ($files) {
+            foreach ($files as $id) {
+                $items[] = $storageItemService->getStorageItem(File::class, $id);
+            }
+        }
+        if ($folders) {
+            foreach ($folders as $id) {
+                $items[] = $storageItemService->getStorageItem(Folder::class, $id);
+            }
+        }
 
         $inTrash = RequestHandler::getRequestParameter($request, "in_trash");
 
@@ -44,14 +51,25 @@ class ModifyStorageItemController extends AbstractController
         if ($parent) {
             $parent = $storageItemService->getStorageItem(Folder::class, $parent);
             $permissionService->assertPermission($user, Permission::WRITE, $parent);
-            if ($parent->isInTrash()) throw new BadRequestHttpException("parent folder is in trash");
+            if ($parent->isInTrash()) {
+                throw new BadRequestHttpException("parent folder is in trash");
+            }
         }
 
         foreach ($items as $item) {
             $item->updateVersion();
             if ($parent) {
-                if ($item->isInTrash()) throw new BadRequestHttpException(EntityTypeMapper::getNameFromClass($item::class) . " " . $item->getId() . " is in trash");
-                if ($item->getWorkspace() !== $parent->getWorkspace()) throw new BadRequestHttpException(EntityTypeMapper::getNameFromClass($item::class) . " " . $item->getId() . " is not in same workspace");
+                if ($item->isInTrash()) {
+                    throw new BadRequestHttpException(
+                        EntityTypeMapper::getNameFromClass($item::class) . " " . $item->getId() . " is in trash"
+                    );
+                }
+                if ($item->getWorkspace() !== $parent->getWorkspace()) {
+                    throw new BadRequestHttpException(
+                        EntityTypeMapper::getNameFromClass($item::class) . " " . $item->getId(
+                        ) . " is not in same workspace"
+                    );
+                }
                 $permissionService->assertPermission($user, Permission::WRITE, $item);
                 $moveService->moveStorageItem($item, $parent);
             }
@@ -66,9 +84,13 @@ class ModifyStorageItemController extends AbstractController
             }
         }
 
-        if ($parent) $parent->updateVersion();
+        if ($parent) {
+            $parent->updateVersion();
+        }
         $entityManager->flush();
 
-        return new Response("done");
+        return $this->json($items, 200, [], [
+            "groups" => ["default", "file_details", "folder_details"]
+        ]);
     }
 }

@@ -6,15 +6,14 @@ use App\Entity\Role;
 use App\Entity\User;
 use App\Entity\Workspace;
 use App\Security\Permission;
-use App\Service\ObjectMaker\RoleObjectService;
 use App\Service\PermissionService;
 use App\Service\RolePositionService;
 use App\Utils\RequestHandler;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
@@ -25,36 +24,42 @@ class ModifyRoleController extends AbstractController
 {
     #[Route('/api/workspaces/{workspace_id}/roles/{id}', name: 'api_workspaces_roles_modify', methods: 'PATCH')]
     public function modify(
-        Request                                    $request,
+        Request $request,
         #[MapEntity(id: 'workspace_id')] Workspace $workspace,
-        #[MapEntity(id: 'id')] Role                $role,
-        #[CurrentUser] User                        $user,
-        RolePositionService                        $rolePositionService,
-        ValidatorInterface                         $validator,
-        EntityManagerInterface                     $entityManager,
-        RoleObjectService                          $roleObjectService,
-        PermissionService                          $permissionService
-    ): Response
-    {
+        #[MapEntity(id: 'id')] Role $role,
+        #[CurrentUser] User $user,
+        RolePositionService $rolePositionService,
+        ValidatorInterface $validator,
+        EntityManagerInterface $entityManager,
+        PermissionService $permissionService
+    ): JsonResponse {
         $permissionService->hasWorkspacePermission($user, Permission::EDIT_PERMISSIONS, $workspace);
         $member = $user->getWorkspaceMember($workspace);
-        if (!$member->isOwner() && $role->getPosition() >= $member->getRoles()[0]->getPosition()) throw new AccessDeniedHttpException();
+        if (!$member->isOwner() && $role->getPosition() >= $member->getRoles()[0]->getPosition()) {
+            throw new AccessDeniedHttpException();
+        }
 
         $name = RequestHandler::getRequestParameter($request, "name");
         $color = RequestHandler::getRequestParameter($request, "color");
         $position = RequestHandler::getRequestParameter($request, "position");
         $permissions = RequestHandler::getRequestParameter($request, "permissions") ?? [];
 
-        if (!$role->isDefault() && $name) $role->setName($name);
+        if (!$role->isDefault() && $name) {
+            $role->setName($name);
+        }
 
-        if (!$role->isDefault() && $color) $role->setColor($color);
+        if (!$role->isDefault() && $color) {
+            $role->setColor($color);
+        }
 
         foreach ($permissions as $permission => $value) {
             $role->setPermission($permission, $value);
         }
 
         if (!$role->isDefault() && $position && $position !== $role->getPosition()) {
-            if (!$member->isOwner() && $member->getRoles()[0]->getPosition() > $position) throw new AccessDeniedHttpException();
+            if (!$member->isOwner() && $member->getRoles()[0]->getPosition() > $position) {
+                throw new AccessDeniedHttpException();
+            }
             $rolePositionService->setRolePosition($role, $position);
         }
 
@@ -64,6 +69,6 @@ class ModifyRoleController extends AbstractController
 
         $entityManager->flush();
 
-        return $this->json($roleObjectService->getRoleObject($role));
+        return $this->json($role);
     }
 }

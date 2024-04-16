@@ -9,8 +9,8 @@ use App\Service\PermissionService;
 use App\Utils\RequestHandler;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
@@ -18,13 +18,12 @@ class ModifyFileController extends AbstractController
 {
     #[Route('/api/files/{id}', name: 'api_files_modify', methods: "PATCH")]
     public function modify(
-        Request                $request,
-        File                   $file,
-        #[CurrentUser] User    $user,
+        Request $request,
+        File $file,
+        #[CurrentUser] User $user,
         EntityManagerInterface $entityManager,
-        PermissionService      $permissionService
-    ): Response
-    {
+        PermissionService $permissionService
+    ): JsonResponse {
         $name = RequestHandler::getRequestParameter($request, "name", true);
 
         if ($name) {
@@ -35,6 +34,6 @@ class ModifyFileController extends AbstractController
         $file->updateVersion();
         $entityManager->flush();
 
-        return new Response("done");
+        return $this->json($file);
     }
 }

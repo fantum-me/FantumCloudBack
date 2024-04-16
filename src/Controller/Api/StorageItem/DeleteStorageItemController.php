@@ -23,24 +23,33 @@ class DeleteStorageItemController extends AbstractController
 {
     #[Route('/api/storage-items', name: 'api_storage_items_delete', methods: "DELETE")]
     public function delete(
-        Request                  $request,
-        #[CurrentUser] User      $user,
-        StorageItemService       $storageItemService,
-        EntityManagerInterface   $entityManager,
+        Request $request,
+        #[CurrentUser] User $user,
+        StorageItemService $storageItemService,
+        EntityManagerInterface $entityManager,
         StorageItemDeleteService $itemDeleteService,
-        PermissionService        $permissionService
-    ): Response
-    {
+        PermissionService $permissionService
+    ): Response {
         [$files, $folders] = RequestHandler::getTwoRequestParameters($request, "files", "folders");
         $items = [];
 
-        if ($files) foreach ($files as $id) $items[] = $storageItemService->getStorageItem(File::class, $id);
-        if ($folders) foreach ($folders as $id) $items[] = $storageItemService->getStorageItem(Folder::class, $id);
+        if ($files) {
+            foreach ($files as $id) {
+                $items[] = $storageItemService->getStorageItem(File::class, $id);
+            }
+        }
+        if ($folders) {
+            foreach ($folders as $id) {
+                $items[] = $storageItemService->getStorageItem(Folder::class, $id);
+            }
+        }
 
         foreach ($items as $item) {
-            if (!$item->isInTrash()) throw new BadRequestHttpException(
-                EntityTypeMapper::getNameFromClass($item::class) . " " . $item->getId() . " not in trash"
-            );
+            if (!$item->isInTrash()) {
+                throw new BadRequestHttpException(
+                    EntityTypeMapper::getNameFromClass($item::class) . " " . $item->getId() . " not in trash"
+                );
+            }
             $permissionService->assertPermission($user, Permission::DELETE, $item);
             $itemDeleteService->deleteStorageItem($item);
         }

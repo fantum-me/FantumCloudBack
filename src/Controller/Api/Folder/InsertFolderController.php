@@ -6,7 +6,6 @@ use App\Entity\Folder;
 use App\Entity\User;
 use App\Factory\FolderFactory;
 use App\Security\Permission;
-use App\Service\ObjectMaker\StorageItemObjectService;
 use App\Service\PermissionService;
 use App\Service\StorageItem\StorageItemService;
 use App\Utils\RequestHandler;
@@ -21,15 +20,13 @@ class InsertFolderController extends AbstractController
 {
     #[Route('/api/folders', name: 'api_folders_insert', methods: "POST")]
     public function insert(
-        Request                  $request,
-        #[CurrentUser] User      $user,
-        FolderFactory            $folderFactory,
-        StorageItemObjectService $objectService,
-        EntityManagerInterface   $entityManager,
-        StorageItemService       $storageItemService,
-        PermissionService        $permissionService
-    ): JsonResponse
-    {
+        Request $request,
+        #[CurrentUser] User $user,
+        FolderFactory $folderFactory,
+        EntityManagerInterface $entityManager,
+        StorageItemService $storageItemService,
+        PermissionService $permissionService
+    ): JsonResponse {
         $name = RequestHandler::getRequestParameter($request, "name", true);
         $parentId = RequestHandler::getRequestParameter($request, "parent_id", true);
         $parent = $storageItemService->getStorageItem(Folder::class, $parentId);
@@ -39,6 +36,8 @@ class InsertFolderController extends AbstractController
 
         $entityManager->flush();
 
-        return $this->json($objectService->getFolderObject($folder));
+        return $this->json($folder, 200, [], [
+            'groups' => ["default", "folder_details", "folder_parents"]
+        ]);
     }
 }

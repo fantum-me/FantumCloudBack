@@ -9,8 +9,8 @@ use App\Service\PermissionService;
 use App\Utils\RequestHandler;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
@@ -18,13 +18,12 @@ class ModifyFolderController extends AbstractController
 {
     #[Route('/api/folders/{id}', name: 'api_folders_modify', methods: "PATCH")]
     public function modify(
-        Request                $request,
-        Folder                 $folder,
-        #[CurrentUser] User    $user,
+        Request $request,
+        Folder $folder,
+        #[CurrentUser] User $user,
         EntityManagerInterface $entityManager,
-        PermissionService      $permissionService
-    ): Response
-    {
+        PermissionService $permissionService
+    ): JsonResponse {
         $name = RequestHandler::getRequestParameter($request, "name");
 
         if ($name) {
@@ -35,6 +34,6 @@ class ModifyFolderController extends AbstractController
         $folder->updateVersion();
         $entityManager->flush();
 
-        return new Response("done");
+        return $this->json($folder);
     }
 }

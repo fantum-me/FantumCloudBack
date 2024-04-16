@@ -3,7 +3,6 @@
 namespace App\Controller\Api\Workspace;
 
 use App\Entity\User;
-use App\Service\ObjectMaker\WorkspaceObjectService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
@@ -13,13 +12,11 @@ class ListWorkspacesController extends AbstractController
 {
     #[Route('/api/workspaces', name: 'api_workspaces_list', methods: "GET")]
     public function list(
-        #[CurrentUser] User    $user,
-        WorkspaceObjectService $workspaceObjectService
-    ): JsonResponse
-    {
+        #[CurrentUser] User $user
+    ): JsonResponse {
         $workspaces = [];
         foreach ($user->getRelatedMembers() as $member) {
-            $workspaces[] = $workspaceObjectService->getWorkspaceObject($member->getWorkspace());
+            $workspaces[] = $member->getWorkspace();
         }
         return $this->json($workspaces);
     }

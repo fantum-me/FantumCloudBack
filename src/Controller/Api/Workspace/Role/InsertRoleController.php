@@ -6,13 +6,12 @@ use App\Entity\User;
 use App\Entity\Workspace;
 use App\Factory\RoleFactory;
 use App\Security\Permission;
-use App\Service\ObjectMaker\RoleObjectService;
 use App\Service\PermissionService;
 use App\Utils\RequestHandler;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
@@ -20,15 +19,13 @@ class InsertRoleController extends AbstractController
 {
     #[Route('/api/workspaces/{id}/roles', name: 'api_workspaces_roles_insert', methods: 'POST')]
     public function insert(
-        Request                $request,
-        Workspace              $workspace,
-        #[CurrentUser] User    $user,
+        Request $request,
+        Workspace $workspace,
+        #[CurrentUser] User $user,
         EntityManagerInterface $entityManager,
-        RoleFactory            $roleFactory,
-        RoleObjectService      $roleObjectService,
-        PermissionService      $permissionService
-    ): Response
-    {
+        RoleFactory $roleFactory,
+        PermissionService $permissionService
+    ): JsonResponse {
         $permissionService->hasWorkspacePermission($user, Permission::EDIT_PERMISSIONS, $workspace);
         $name = RequestHandler::getRequestParameter($request, "name", true);
 
@@ -42,6 +39,6 @@ class InsertRoleController extends AbstractController
 
         $entityManager->flush();
 
-        return $this->json($roleObjectService->getRoleObject($role));
+        return $this->json($role);
     }
 }
