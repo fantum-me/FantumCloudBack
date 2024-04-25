@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Interface\StorageItemInterface;
+use App\Entity\Member;
 use App\Entity\Workspace;
 use App\Utils\EntityTypeMapper;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -10,14 +11,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class PermissionService
 {
-    public function hasItemPermission(UserInterface $user, string $permission, StorageItemInterface $resource): bool
+    public function hasItemPermission(Member $member, string $permission, StorageItemInterface $resource): bool
     {
-        $workspace = $resource->getWorkspace();
-        $member = $user->getWorkspaceMember($workspace);
+        $workspace = $member->getWorkspace();
 
-        if (!$member) {
-            return false;
-        }
         if ($workspace->getOwner() === $member) {
             return true;
         }
@@ -39,17 +36,15 @@ class PermissionService
         }
 
         // Check parent resource permissions recursively
-        $folder = $resource->getFolder();
-        if ($folder !== null) {
-            return $this->hasItemPermission($user, $permission, $folder);
+        if ($folder = $resource->getFolder()) {
+            return $this->hasItemPermission($member, $permission, $folder);
         } else {
-            return $this->hasWorkspacePermission($user, $permission, $workspace);
+            return $this->hasWorkspacePermission($member, $permission, $workspace);
         }
     }
 
-    public function hasWorkspacePermission(UserInterface $user, string $permission, Workspace $workspace): bool
+    public function hasWorkspacePermission(?Member $member, string $permission, Workspace $workspace): bool
     {
-        $member = $user->getWorkspaceMember($workspace);
         if (!$member) {
             return false;
         }
@@ -65,15 +60,29 @@ class PermissionService
         return false;
     }
 
-    public function assertPermission(UserInterface $user, string $permission, StorageItemInterface $item): void
-    {
-        if (!PermissionService::hasItemPermission($user, $permission, $item)) {
+    public function assertPermission(
+        UserInterface $user,
+        string $permission,
+        StorageItemInterface|Workspace $resource
+    ): void {
+        $workspace = $resource instanceof Workspace ? $resource : $resource->getWorkspace();
+
+        self::assertAccess($user, $workspace);
+        $member = $user->getWorkspaceMember($workspace);
+
+        if ($resource instanceof Workspace) {
+            $hasPermission = self::hasWorkspacePermission($member, $permission, $resource);
+        } else {
+            $hasPermission = self::hasItemPermission($member, $permission, $resource);
+        }
+
+        if (!$hasPermission) {
             throw new AccessDeniedHttpException(
                 sprintf(
-                    "You don't have permission to %s %s %s",
+                    "You don't have permission to %s (%s %s)",
                     strtolower($permission),
-                    EntityTypeMapper::getNameFromClass($item::class),
-                    $item->getId()
+                    EntityTypeMapper::getNameFromClass($resource::class),
+                    $resource->getId()
                 )
             );
         }

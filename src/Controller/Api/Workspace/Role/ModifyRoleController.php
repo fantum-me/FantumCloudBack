@@ -33,7 +33,7 @@ class ModifyRoleController extends AbstractController
         EntityManagerInterface $entityManager,
         PermissionService $permissionService
     ): JsonResponse {
-        $permissionService->hasWorkspacePermission($user, Permission::EDIT_PERMISSIONS, $workspace);
+        $permissionService->assertPermission($user, Permission::EDIT_PERMISSIONS, $workspace);
         $member = $user->getWorkspaceMember($workspace);
         if (!$member->isOwner() && $role->getPosition() >= $member->getRoles()[0]->getPosition()) {
             throw new AccessDeniedHttpException();

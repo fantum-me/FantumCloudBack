@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Controller\Api\StorageItem;
+namespace App\Controller\Api\Workspace\Item;
 
 use App\Entity\File;
 use App\Entity\Folder;
 use App\Entity\User;
+use App\Entity\Workspace;
 use App\Security\Permission;
 use App\Service\PermissionService;
 use App\Service\StorageItem\StorageItemMoveService;
@@ -22,15 +23,18 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class ModifyStorageItemController extends AbstractController
 {
-    #[Route('/api/storage-items', name: 'api_storage_items_modify', methods: "PATCH")]
+    #[Route('/api/workspaces/{id}/items', name: 'api_workspaces_items_modify', methods: "PATCH")]
     public function modify(
         Request $request,
+        Workspace $workspace,
         #[CurrentUser] User $user,
         StorageItemService $storageItemService,
         EntityManagerInterface $entityManager,
         StorageItemMoveService $moveService,
         PermissionService $permissionService
     ): JsonResponse {
+        $permissionService->assertAccess($user, $workspace);
+
         [$files, $folders] = RequestHandler::getTwoRequestParameters($request, "files", "folders");
         $items = [];
 

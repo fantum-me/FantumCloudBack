@@ -4,6 +4,8 @@ namespace App\Controller\Api\Workspace;
 
 use App\Entity\User;
 use App\Entity\Workspace;
+use App\Repository\FileRepository;
+use App\Repository\FolderRepository;
 use App\Service\PermissionService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,25 +18,15 @@ class GetWorkspaceTrashController extends AbstractController
     public function trash(
         Workspace $workspace,
         #[CurrentUser] User $user,
-        PermissionService $permissionService
+        PermissionService $permissionService,
+        FolderRepository $folderRepository,
+        FileRepository $fileRepository
     ): JsonResponse {
         $permissionService->assertAccess($user, $workspace);
 
-        [$files, $folders] = [[], []];
-        foreach ($workspace->getFiles() as $f) {
-            if ($f->isInTrash()) {
-                $files[] = $f;
-            }
-        }
-        foreach ($workspace->getFolders() as $f) {
-            if ($f->isInTrash()) {
-                $folders[] = $f;
-            }
-        }
-
         $res = [
-            "files" => $files,
-            "folders" => $folders
+            "files" => $fileRepository->findBy(["workspace" => $workspace, "inTrash" => true]),
+            "folders" => $folderRepository->findBy(["workspace" => $workspace, "inTrash" => true]),
         ];
 
         return $this->json($res, 200, [], [

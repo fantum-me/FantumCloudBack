@@ -21,54 +21,60 @@ class UserAccessNormalizer implements NormalizerInterface
     public function normalize($object, ?string $format = null, array $context = []): array
     {
         $resource = $context["resource"];
+        $workspace = $resource instanceof StorageItemInterface ? $resource->getWorkspace() : $resource;
+        $member = $object->getWorkspaceMember($workspace);
 
         $data = [];
 
         if ($resource instanceof StorageItemInterface) {
-            $data[Permission::READ] = $this->permissionService->hasItemPermission($object, Permission::READ, $resource);
+            $data[Permission::READ] = $this->permissionService->hasItemPermission(
+                $member,
+                Permission::READ,
+                $resource
+            );
             $data[Permission::WRITE] = $this->permissionService->hasItemPermission(
-                $object,
+                $member,
                 Permission::WRITE,
                 $resource
             );
             $data[Permission::TRASH] = $this->permissionService->hasItemPermission(
-                $object,
+                $member,
                 Permission::TRASH,
                 $resource
             );
             $data[Permission::DELETE] = $this->permissionService->hasItemPermission(
-                $object,
+                $member,
                 Permission::DELETE,
                 $resource
             );
             $data[Permission::EDIT_PERMISSIONS] = $this->permissionService->hasItemPermission(
-                $object,
+                $member,
                 Permission::EDIT_PERMISSIONS,
                 $resource
             );
         } elseif ($resource instanceof Workspace) {
             $data[Permission::READ] = $this->permissionService->hasWorkspacePermission(
-                $object,
+                $member,
                 Permission::READ,
                 $resource
             );
             $data[Permission::WRITE] = $this->permissionService->hasWorkspacePermission(
-                $object,
+                $member,
                 Permission::WRITE,
                 $resource
             );
             $data[Permission::TRASH] = $this->permissionService->hasWorkspacePermission(
-                $object,
+                $member,
                 Permission::TRASH,
                 $resource
             );
             $data[Permission::DELETE] = $this->permissionService->hasWorkspacePermission(
-                $object,
+                $member,
                 Permission::DELETE,
                 $resource
             );
             $data[Permission::EDIT_PERMISSIONS] = $this->permissionService->hasWorkspacePermission(
-                $object,
+                $member,
                 Permission::EDIT_PERMISSIONS,
                 $resource
             );

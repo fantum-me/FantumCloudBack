@@ -19,7 +19,7 @@ class ListRolesController extends AbstractController
         #[CurrentUser] User $user,
         PermissionService $permissionService
     ): JsonResponse {
-        $permissionService->hasWorkspacePermission($user, Permission::EDIT_PERMISSIONS, $workspace);
+        $permissionService->assertPermission($user, Permission::EDIT_PERMISSIONS, $workspace);
         return $this->json($workspace->getRoles());
     }
 }

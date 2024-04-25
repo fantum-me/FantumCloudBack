@@ -2,7 +2,6 @@
 
 namespace App\Serializer;
 
-use App\Entity\File;
 use App\Entity\Folder;
 use App\Entity\User;
 use App\Security\Permission;
@@ -38,7 +37,7 @@ class FolderNormalizer implements NormalizerInterface
         $data["size"] = FileSizeService::getFolderSize($this->workspacePath . "/" . $object->getPath());
 
         if (isset($context["groups"]) && in_array("folder_parents", $context["groups"])) {
-             $this->addParentsToData($object, $data);
+            $this->addParentsToData($object, $data);
         }
 
         if (isset($context["groups"]) && in_array("folder_children", $context["groups"])) {
@@ -62,21 +61,26 @@ class FolderNormalizer implements NormalizerInterface
 
     private function addChildrenToData(Folder $folder, array &$data, ?string $format, array $context = []): void
     {
-        $user = $this->security->getUser();
-
         $data["files"] = [];
+        $data["folders"] = [];
+
+        $user = $this->security->getUser();
+        $member = $user?->getWorkspaceMember($folder->getWorkspace());
+        if ($user && !$member) {
+            return;
+        }
+
         foreach ($folder->getFiles() as $file) {
             if (!$file->isInTrash()) {
-                if (!$user || $this->permissionService->hasItemPermission($user, Permission::READ, $file)) {
+                if (!$user || $this->permissionService->hasItemPermission($member, Permission::READ, $file)) {
                     $data["files"][] = $this->fileNormalizer->normalize($file, $format, $context);
                 }
             }
         }
 
-        $data["folders"] = [];
         foreach ($folder->getFolders() as $folder) {
             if (!$folder->isInTrash()) {
-                if (!$user || $this->permissionService->hasItemPermission($user, Permission::READ, $folder)) {
+                if (!$user || $this->permissionService->hasItemPermission($member, Permission::READ, $folder)) {
                     $data["folders"][] = $this->normalize($folder, $format, $context);
                 }
             }
@@ -85,6 +89,11 @@ class FolderNormalizer implements NormalizerInterface
 
     private function addParentsToData(Folder $folder, array &$data): void
     {
+        if ($folder->isInTrash()) {
+            $data["parents"] = [["id" => "trash", "name" => "Trash"]];
+            return;
+        }
+
         $parents = [];
         $parent = $folder->getFolder();
 

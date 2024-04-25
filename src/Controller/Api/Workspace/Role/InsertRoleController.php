@@ -26,7 +26,7 @@ class InsertRoleController extends AbstractController
         RoleFactory $roleFactory,
         PermissionService $permissionService
     ): JsonResponse {
-        $permissionService->hasWorkspacePermission($user, Permission::EDIT_PERMISSIONS, $workspace);
+        $permissionService->assertPermission($user, Permission::EDIT_PERMISSIONS, $workspace);
         $name = RequestHandler::getRequestParameter($request, "name", true);
 
         $role = $roleFactory->createRole($name, 1, $workspace, [
