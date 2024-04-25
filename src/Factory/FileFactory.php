@@ -52,7 +52,7 @@ class FileFactory
         $name = $uploadedFile->getClientOriginalName();
         $ext = $uploadedFile->getClientOriginalExtension();
         $content = file_get_contents($uploadedFile->getPathname());
-        $type = $uploadedFile->getClientMimeType();
+        $type = $uploadedFile->getMimeType() ?? $uploadedFile->getClientMimeType();
 
         $name = explode('.', $name);
         array_pop($name);
