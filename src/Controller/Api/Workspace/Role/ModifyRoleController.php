@@ -57,7 +57,7 @@ class ModifyRoleController extends AbstractController
         }
 
         if (!$role->isDefault() && $position && $position !== $role->getPosition()) {
-            if (!$member->isOwner() && $member->getRoles()[0]->getPosition() > $position) {
+            if (!$member->isOwner() && $member->getRoles()[0]->getPosition() <= $position) {
                 throw new AccessDeniedHttpException();
             }
             $rolePositionService->setRolePosition($role, $position);
