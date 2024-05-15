@@ -16,6 +16,7 @@ class AccessControlNormalizer implements NormalizerInterface
     public function normalize($object, ?string $format = null, array $context = []): array
     {
         $data = $this->normalizer->normalize($object, $format, $context);
+        $data["role_id"] = $object->getRole()->getId();
         $data["item_id"] = $object->getItem()->getId();
         return $data;
     }

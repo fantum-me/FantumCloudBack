@@ -14,10 +14,13 @@ class StorageItemService
     )
     {
     }
-    public function getStorageItem(string $type, string $id): ?StorageItemInterface
+
+    public function getStorageItem(string $type, string $id, bool $required = true): ?StorageItemInterface
     {
         $item = $this->entityManager->find($type, $id);
-        if (!$item) throw new BadRequestHttpException(EntityTypeMapper::getNameFromClass($type) . " $id not found");
+        if ($required && !$item) {
+            throw new BadRequestHttpException(EntityTypeMapper::getNameFromClass($type) . " $id not found");
+        }
         return $item;
     }
 }

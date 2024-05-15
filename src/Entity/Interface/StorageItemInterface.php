@@ -2,8 +2,8 @@
 
 namespace App\Entity\Interface;
 
-use App\Entity\Folder;
 use App\Entity\AccessControl;
+use App\Entity\Folder;
 use App\Entity\Workspace;
 use DateTimeInterface;
 use Doctrine\Common\Collections\Collection;
@@ -39,4 +39,8 @@ interface StorageItemInterface extends UidInterface
     public function getVersion(): int;
 
     public function getAccessControls(): ?Collection;
+
+    public function addAccessControl(AccessControl $accessControl): static;
+
+    public function removeAccessControl(AccessControl $accessControl): static;
 }

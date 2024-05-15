@@ -116,19 +116,19 @@ class File extends AbstractStorageItem
         return $this->accessControls;
     }
 
-    public function addLocalPermission(AccessControl $localPermission): static
+    public function addAccessControl(AccessControl $accessControl): static
     {
-        if (!$this->accessControls->contains($localPermission)) {
-            $this->accessControls->add($localPermission);
-            $localPermission->setItem($this);
+        if (!$this->accessControls->contains($accessControl)) {
+            $this->accessControls->add($accessControl);
+            $accessControl->setItem($this);
         }
 
         return $this;
     }
 
-    public function removeLocalPermission(AccessControl $localPermission): static
+    public function removeAccessControl(AccessControl $accessControl): static
     {
-        $this->accessControls->removeElement($localPermission);
+        $this->accessControls->removeElement($accessControl);
 
         return $this;
     }

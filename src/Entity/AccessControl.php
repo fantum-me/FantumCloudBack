@@ -13,6 +13,7 @@ class AccessControl extends AbstractPermissionManager
 {
     #[ORM\ManyToOne(inversedBy: 'accessControls')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Ignore]
     private ?Role $role = null;
 
     #[ORM\ManyToOne(inversedBy: 'accessControls')]

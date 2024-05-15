@@ -99,22 +99,22 @@ class Role extends AbstractPermissionManager
         return $this->accessControls;
     }
 
-    public function addLocalPermission(AccessControl $localPermission): static
+    public function addAccessControl(AccessControl $accessControl): static
     {
-        if (!$this->accessControls->contains($localPermission)) {
-            $this->accessControls->add($localPermission);
-            $localPermission->setRole($this);
+        if (!$this->accessControls->contains($accessControl)) {
+            $this->accessControls->add($accessControl);
+            $accessControl->setRole($this);
         }
 
         return $this;
     }
 
-    public function removeLocalPermission(AccessControl $localPermission): static
+    public function removeAccessControl(AccessControl $accessControl): static
     {
-        if ($this->accessControls->removeElement($localPermission)) {
+        if ($this->accessControls->removeElement($accessControl)) {
             // set the owning side to null (unless already changed)
-            if ($localPermission->getRole() === $this) {
-                $localPermission->setRole(null);
+            if ($accessControl->getRole() === $this) {
+                $accessControl->setRole(null);
             }
         }
 
