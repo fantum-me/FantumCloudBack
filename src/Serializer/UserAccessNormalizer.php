@@ -79,6 +79,11 @@ class UserAccessNormalizer implements NormalizerInterface
                 Permission::EDIT_PERMISSIONS,
                 $resource
             );
+            $data[Permission::MANAGE_MEMBERS] = $this->permissionService->hasWorkspacePermission(
+                $member,
+                Permission::MANAGE_MEMBERS,
+                $resource
+            );
         }
         return $data;
     }

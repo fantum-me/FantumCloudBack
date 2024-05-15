@@ -38,7 +38,7 @@ class Workspace extends AbstractUid
     private Collection $invites;
 
     #[Ignore]
-    #[ORM\OneToMany(mappedBy: 'workspace', targetEntity: Member::class)]
+    #[ORM\OneToMany(mappedBy: 'workspace', targetEntity: Member::class, orphanRemoval: true)]
     private Collection $members;
 
     #[ORM\OneToMany(mappedBy: 'workspace', targetEntity: Role::class, orphanRemoval: true)]

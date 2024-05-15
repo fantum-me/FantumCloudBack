@@ -25,14 +25,15 @@ class WorkspaceNormalizer implements NormalizerInterface
         $user = $this->security->getUser();
 
         if (isset($context["groups"]) && in_array("workspace_details", $context["groups"])) {
-            if ($user instanceof User) {
-                $data["owner"] = $object->getOwner()->getUser() === $user;
-                $data["access"] = $this->userAccessNormalizer->normalize($user, $format, ["resource" => $object]);
-            }
-
             $data["owner_id"] = $object->getOwner()->getId();
             $data["root"] = $object->getRootFolder()->getId();
             $data["used_space"] = FileSizeService::getFolderSize($this->workspacePath . "/" . $object->getId());
+
+            if ($user instanceof User) {
+                $data["member"] = $user->getWorkspaceMember($object);
+                $data["owner"] = $data["owner_id"] === $data["member"]->getId();
+                $data["access"] = $this->userAccessNormalizer->normalize($user, $format, ["resource" => $object]);
+            }
         }
 
         return $data;

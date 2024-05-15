@@ -10,7 +10,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
-use Symfony\Component\Serializer\Attribute\SerializedName;
 
 #[ORM\Entity(repositoryClass: MemberRepository::class)]
 class Member extends AbstractUid
@@ -25,7 +24,7 @@ class Member extends AbstractUid
     #[Ignore]
     private ?Workspace $workspace = null;
 
-    #[ORM\OneToMany(mappedBy: 'member', targetEntity: Invite::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'createdBy', targetEntity: Invite::class, orphanRemoval: true)]
     #[Ignore]
     private Collection $invites;
 
@@ -109,6 +108,12 @@ class Member extends AbstractUid
         $this->isOwner = $isOwner;
 
         return $this;
+    }
+
+    #[Groups("default")]
+    public function getPosition(): int
+    {
+        return $this->getRoles()[0]->getPosition();
     }
 
     /**

@@ -34,7 +34,7 @@ class Folder extends AbstractStorageItem
     #[Ignore]
     private ?Workspace $workspace = null;
 
-    #[ORM\OneToMany(mappedBy: 'folder', targetEntity: AccessControl::class)]
+    #[ORM\OneToMany(mappedBy: 'folder', targetEntity: AccessControl::class, orphanRemoval: true)]
     #[Groups(["folder_details"])]
     private Collection $accessControls;
 

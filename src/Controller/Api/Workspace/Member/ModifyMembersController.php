@@ -28,7 +28,7 @@ class ModifyMembersController extends AbstractController
         EntityManagerInterface $entityManager,
         PermissionService $permissionService
     ): JsonResponse {
-        $permissionService->assertPermission($user, Permission::EDIT_PERMISSIONS, $workspace);
+        $permissionService->assertPermission($user, Permission::MANAGE_MEMBERS, $workspace);
         $member = $user->getWorkspaceMember($workspace);
 
         $roleIds = RequestHandler::getRequestParameter($request, "roles");

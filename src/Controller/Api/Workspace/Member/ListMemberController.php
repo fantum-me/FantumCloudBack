@@ -4,6 +4,7 @@ namespace App\Controller\Api\Workspace\Member;
 
 use App\Entity\User;
 use App\Entity\Workspace;
+use App\Security\Permission;
 use App\Service\PermissionService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,7 +19,7 @@ class ListMemberController extends AbstractController
         #[CurrentUser] User $user,
         PermissionService $permissionService
     ): JsonResponse {
-        $permissionService->assertAccess($user, $workspace);
+        $permissionService->assertPermission($user, Permission::MANAGE_MEMBERS, $workspace);
         return $this->json($workspace->getMembers());
     }
 }

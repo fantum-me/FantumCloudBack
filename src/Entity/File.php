@@ -39,7 +39,7 @@ class File extends AbstractStorageItem
     #[Ignore]
     private ?Workspace $workspace = null;
 
-    #[ORM\OneToMany(mappedBy: 'file', targetEntity: AccessControl::class)]
+    #[ORM\OneToMany(mappedBy: 'file', targetEntity: AccessControl::class, orphanRemoval: true)]
     #[Groups(["file_details"])]
     private Collection $accessControls;
 

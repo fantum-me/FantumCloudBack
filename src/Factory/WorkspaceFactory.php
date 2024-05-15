@@ -2,7 +2,6 @@
 
 namespace App\Factory;
 
-use App\Entity\Member;
 use App\Entity\User;
 use App\Entity\Workspace;
 use App\Security\Permission;
@@ -34,7 +33,8 @@ class WorkspaceFactory
             Permission::WRITE => true,
             Permission::TRASH => true,
             Permission::DELETE => false,
-            Permission::EDIT_PERMISSIONS => false
+            Permission::EDIT_PERMISSIONS => false,
+            Permission::MANAGE_MEMBERS => false
         ], true);
 
         $member = $this->memberFactory->getOrCreateMember($user, $workspace);

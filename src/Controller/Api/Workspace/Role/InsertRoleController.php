@@ -34,7 +34,8 @@ class InsertRoleController extends AbstractController
             Permission::WRITE => false,
             Permission::TRASH => false,
             Permission::DELETE => false,
-            Permission::EDIT_PERMISSIONS => false
+            Permission::EDIT_PERMISSIONS => false,
+            Permission::MANAGE_MEMBERS => false
         ]);
 
         $entityManager->flush();

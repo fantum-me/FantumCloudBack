@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Entity\Abstract\AbstractPermissionManager;
+use App\Entity\Abstract\AbstractRolePermissionManager;
 use App\Repository\RoleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -12,7 +12,7 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: RoleRepository::class)]
-class Role extends AbstractPermissionManager
+class Role extends AbstractRolePermissionManager
 {
     #[ORM\Column(length: 31)]
     #[Assert\NotBlank]

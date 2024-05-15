@@ -9,6 +9,7 @@ class Permission
     public const TRASH = "trash";
     public const DELETE = "delete";
     public const EDIT_PERMISSIONS = "edit_permissions";
+    public const MANAGE_MEMBERS = "manage_members";
 
     public const PERMISSIONS = [
         self::READ,
