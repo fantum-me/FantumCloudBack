@@ -23,6 +23,10 @@ class PermissionService
 
         $permissionDenied = false;
         foreach ($accessControls as $accessControl) {
+            if (!$member->getRoles()->contains($accessControl->getRole())) {
+                continue;
+            }
+
             $allowed = $accessControl->can($permission);
             if ($allowed === true) {
                 return true;
