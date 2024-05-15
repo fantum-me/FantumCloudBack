@@ -3,6 +3,7 @@
 namespace App\Serializer;
 
 use App\Entity\Interface\StorageItemInterface;
+use App\Entity\Member;
 use App\Entity\User;
 use App\Entity\Workspace;
 use App\Security\Permission;
@@ -22,7 +23,7 @@ class UserAccessNormalizer implements NormalizerInterface
     {
         $resource = $context["resource"];
         $workspace = $resource instanceof StorageItemInterface ? $resource->getWorkspace() : $resource;
-        $member = $object->getWorkspaceMember($workspace);
+        $member = $object instanceof User ? $object->getWorkspaceMember($workspace) : $object;
 
         $data = [];
 
@@ -84,7 +85,7 @@ class UserAccessNormalizer implements NormalizerInterface
 
     public function supportsNormalization($data, ?string $format = null, array $context = []): bool
     {
-        return $data instanceof User
+        return ($data instanceof User || $data instanceof Member)
             && isset($context['resource']) && (
                 $context["resource"] instanceof StorageItemInterface
                 || $context["resource"] instanceof Workspace
