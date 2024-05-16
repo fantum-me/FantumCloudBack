@@ -41,7 +41,12 @@ class FolderNormalizer implements NormalizerInterface
         }
 
         if (isset($context["groups"]) && in_array("folder_children", $context["groups"])) {
-            $this->addChildrenToData($object, $data, $format, $context);
+            $this->addChildrenToData(
+                $object,
+                $data,
+                $format,
+                ["groups" => ["default", "file_details", "folder_details"]]
+            );
         }
 
         return $data;

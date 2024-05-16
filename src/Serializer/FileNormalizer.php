@@ -5,7 +5,6 @@ namespace App\Serializer;
 use App\Entity\File;
 use App\Entity\User;
 use App\Service\FileSizeService;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
