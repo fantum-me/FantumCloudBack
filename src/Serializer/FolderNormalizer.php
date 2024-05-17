@@ -32,6 +32,7 @@ class FolderNormalizer implements NormalizerInterface
             $data["access"] = $this->userAccessNormalizer->normalize($user, $format, ["resource" => $object]);
         }
         $data["workspace_id"] = $object->getWorkspace()->getId();
+        $data["parent_id"] = $object->getFolder()?->getId();
 
         $data["is_root"] = $object->getFolder() === null;
         $data["size"] = FileSizeService::getFolderSize($this->workspacePath . "/" . $object->getPath());
