@@ -38,8 +38,10 @@ class FileNormalizer implements NormalizerInterface
 
         if (str_starts_with($object->getType(), 'image')) {
             $dimension = getimagesize($this->workspacePath . "/" . $object->getPath());
-            $data["width"] = $dimension[0];
-            $data["height"] = $dimension[1];
+            if ($dimension) {
+                $data["width"] = $dimension[0];
+                $data["height"] = $dimension[1];
+            }
         }
 
         return $data;
