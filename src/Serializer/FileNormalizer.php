@@ -36,6 +36,12 @@ class FileNormalizer implements NormalizerInterface
         $data["size"] = FileSizeService::getFileSize($this->workspacePath . "/" . $object->getPath());
         $data["parent_id"] = $object->getFolder()->getId();
 
+        if (str_starts_with($object->getType(), 'image')) {
+            $dimension = getimagesize($this->workspacePath . "/" . $object->getPath());
+            $data["width"] = $dimension[0];
+            $data["height"] = $dimension[1];
+        }
+
         return $data;
     }
 
