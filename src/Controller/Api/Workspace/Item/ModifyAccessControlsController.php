@@ -25,7 +25,7 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class ModifyAccessControlsController extends AbstractController
 {
-    #[Route("/api/workspace/{workspace_id}/items/{id}/access-controls", name: "api_workspace_items_modify_access_controls", methods: "PATCH")]
+    #[Route("/api/workspaces/{workspace_id}/items/{id}/access-controls", name: "api_workspaces_items_modify_access_controls", methods: "PATCH")]
     public function modify_access_controls(
         Request $request,
         #[MapEntity(id: 'workspace_id')] Workspace $workspace,
