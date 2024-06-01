@@ -25,9 +25,9 @@ class FilePreviewServiceTest extends KernelTestCase
             $previewPath = $fixture->getFilename() . "-preview." . FilePreviewService::PREVIEW_FORMAT;
             $file->method("getPreviewPath")->willReturn($previewPath);
 
-            $file->method("getType")->willReturn(mime_content_type($fixture->getPathname()));
+            $file->method("getMime")->willReturn(mime_content_type($fixture->getPathname()));
 
-            yield [$file, $fixture->getPathname(), FilePreviewService::isTypePreviewable($file->getType())];
+            yield [$file, $fixture->getPathname(), FilePreviewService::isTypePreviewable($file->getMime())];
         }
     }
 

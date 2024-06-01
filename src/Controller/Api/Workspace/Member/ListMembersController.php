@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
-class ListMemberController extends AbstractController
+class ListMembersController extends AbstractController
 {
     #[Route('/api/workspaces/{id}/members', name: 'api_workspaces_members_list', methods: 'GET')]
     public function list(

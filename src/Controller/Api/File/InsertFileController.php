@@ -39,7 +39,7 @@ class InsertFileController extends AbstractController
         $entityManager->flush();
 
         return $this->json($file, 200, [], [
-            "groups" => ["default", "file_details"]
+            "groups" => ["default", "item_details"]
         ]);
     }
 }

@@ -38,7 +38,7 @@ class ListRecentFilesController extends AbstractController
         }
 
         return $this->json($items, context: [
-            "groups" => ["default", "file_details", "folder_details"]
+            "groups" => ["default", "item_details"]
         ]);
     }
 }

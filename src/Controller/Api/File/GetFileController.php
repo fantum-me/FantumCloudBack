@@ -21,7 +21,7 @@ class GetFileController extends AbstractController
     ): JsonResponse {
         $permissionService->assertPermission($user, Permission::READ, $file);
         return $this->json($file, 200, [], [
-            "groups" => ["default", "file_details"]
+            "groups" => ["default", "item_details"]
         ]);
     }
 }

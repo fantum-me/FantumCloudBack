@@ -2,16 +2,19 @@
 
 namespace App\Serializer;
 
+use App\Entity\File;
 use App\Entity\Folder;
+use App\Entity\StorageItem;
 use App\Entity\User;
 use App\Security\Permission;
 use App\Service\FileSizeService;
 use App\Service\PermissionService;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
-class FolderNormalizer implements NormalizerInterface
+class StorageItemNormalizer implements NormalizerInterface
 {
     public function __construct(
         private readonly ObjectNormalizer $normalizer,
@@ -19,7 +22,7 @@ class FolderNormalizer implements NormalizerInterface
         private readonly UserAccessNormalizer $userAccessNormalizer,
         private readonly string $workspacePath,
         private readonly PermissionService $permissionService,
-        private readonly FileNormalizer $fileNormalizer
+        private readonly Filesystem $filesystem
     ) {
     }
 
@@ -27,27 +30,44 @@ class FolderNormalizer implements NormalizerInterface
     {
         $data = $this->normalizer->normalize($object, $format, $context);
         $user = $this->security->getUser();
+        $path = $this->workspacePath . "/" . $object->getPath();
 
         if ($user instanceof User) {
             $data["access"] = $this->userAccessNormalizer->normalize($user, $format, ["resource" => $object]);
         }
+
         $data["workspace_id"] = $object->getWorkspace()->getId();
         $data["parent_id"] = $object->getFolder()?->getId();
 
-        $data["is_root"] = $object->getFolder() === null;
-        $data["size"] = FileSizeService::getFolderSize($this->workspacePath . "/" . $object->getPath());
+        $data["size"] = FileSizeService::getItemSize($path);
 
-        if (isset($context["groups"]) && in_array("folder_parents", $context["groups"])) {
+        if (isset($context["groups"]) && in_array("item_parents", $context["groups"])) {
             $this->addParentsToData($object, $data);
         }
 
-        if (isset($context["groups"]) && in_array("folder_children", $context["groups"])) {
-            $this->addChildrenToData(
-                $object,
-                $data,
-                $format,
-                ["groups" => ["default", "file_details", "folder_details"]]
-            );
+        if ($object instanceof File) {
+            $data["type"] = "file";
+            $data["has_preview"] = $this->filesystem->exists($this->workspacePath . "/" . $object->getPreviewPath());
+
+            if (str_starts_with($object->getMime(), 'image')) {
+                $dimension = getimagesize($path);
+                if ($dimension) {
+                    $data["width"] = $dimension[0];
+                    $data["height"] = $dimension[1];
+                }
+            }
+        } elseif ($object instanceof Folder) {
+            $data["type"] = "folder";
+            $data["is_root"] = $object->getFolder() === null;
+
+            if (isset($context["groups"]) && in_array("folder_children", $context["groups"])) {
+                $this->addChildrenToData(
+                    $object,
+                    $data,
+                    $format,
+                    ["groups" => ["default", "item_details"]]
+                );
+            }
         }
 
         return $data;
@@ -55,13 +75,13 @@ class FolderNormalizer implements NormalizerInterface
 
     public function supportsNormalization($data, ?string $format = null, array $context = []): bool
     {
-        return $data instanceof Folder;
+        return $data instanceof StorageItem;
     }
 
     public function getSupportedTypes(?string $format): array
     {
         return [
-            Folder::class => true,
+            StorageItem::class => true,
         ];
     }
 
@@ -76,38 +96,30 @@ class FolderNormalizer implements NormalizerInterface
             return;
         }
 
-        foreach ($folder->getFiles() as $file) {
-            if (!$file->isInTrash()) {
-                if (!$user || $this->permissionService->hasItemPermission($member, Permission::READ, $file)) {
-                    $data["files"][] = $this->fileNormalizer->normalize($file, $format, $context);
-                }
-            }
-        }
-
-        foreach ($folder->getFolders() as $folder) {
-            if (!$folder->isInTrash()) {
-                if (!$user || $this->permissionService->hasItemPermission($member, Permission::READ, $folder)) {
-                    $data["folders"][] = $this->normalize($folder, $format, $context);
+        foreach ($folder->getItems() as $item) {
+            if (!$item->isInTrash()) {
+                if (!$user || $this->permissionService->hasItemPermission($member, Permission::READ, $item)) {
+                    $data["items"][] = $this->normalize($item, $format, $context);
                 }
             }
         }
     }
 
-    private function addParentsToData(Folder $folder, array &$data): void
+    private function addParentsToData(StorageItem $item, array &$data): void
     {
-        if ($folder->isInTrash()) {
+        if ($item->isInTrash()) {
             $data["parents"] = [["id" => "trash", "name" => "Trash"]];
             return;
         }
 
         $parents = [];
-        $parent = $folder->getFolder();
+        $parent = $item->getFolder();
 
         while ($parent) {
             $parents[] = [
                 "id" => $parent->getId(),
                 "name" => $parent->getName(),
-                "is_root" => $folder->getWorkspace()->getRootFolder() === $parent
+                "is_root" => $item->getWorkspace()->getRootFolder() === $parent
             ];
 
             if ($parent->isInTrash()) {

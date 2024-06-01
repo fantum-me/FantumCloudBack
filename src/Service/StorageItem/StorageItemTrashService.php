@@ -14,24 +14,19 @@ class StorageItemTrashService
         $item->setInTrash(true);
         $item->updateVersion();
 
-        if (get_class($item) === Folder::class) self::removeChildrenFromTrash($item);
+        if ($item instanceof Folder) self::removeChildrenFromTrash($item);
     }
 
     private static function removeChildrenFromTrash(Folder $parent): void
     {
-        foreach ($parent->getFiles() as $file) {
-            if ($file->isInTrash()) {
-                $file->setInTrash(false);
-                $file->updateVersion();
+        foreach ($parent->getItems() as $item) {
+            if ($item->isInTrash()) {
+                $item->setInTrash(false);
+                $item->updateVersion();
             }
-        }
-
-        foreach ($parent->getFolders() as $folder) {
-            if ($folder->isInTrash()) {
-                $folder->setInTrash(false);
-                $folder->updateVersion();
+            if ($item instanceof Folder) {
+                self::removeChildrenFromTrash($item);
             }
-            self::removeChildrenFromTrash($folder);
         }
     }
 

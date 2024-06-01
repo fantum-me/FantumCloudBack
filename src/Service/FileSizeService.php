@@ -15,6 +15,11 @@ class FileSizeService
     ) {
     }
 
+    public static function getItemSize(string $path): int
+    {
+        return is_dir($path) ? static::getFolderSize($path) : static::getFileSize($path);
+    }
+
     public static function getFileSize(string $path): int
     {
         return filesize($path);

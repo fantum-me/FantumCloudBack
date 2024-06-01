@@ -24,12 +24,12 @@ class FileFactory
     ) {
     }
 
-    public function createFile(string $name, string $ext, string $type, Folder $targetFolder): File
+    public function createFile(string $name, string $ext, string $mime, Folder $targetFolder): File
     {
         $file = new File();
         $file->setName($name)
             ->setExt($ext)
-            ->setType($type)
+            ->setMime($mime)
             ->setWorkspace($targetFolder->getWorkspace())
             ->setFolder($targetFolder)
             ->updateVersion();
@@ -52,13 +52,13 @@ class FileFactory
         $name = $uploadedFile->getClientOriginalName();
         $ext = $uploadedFile->getClientOriginalExtension();
         $content = file_get_contents($uploadedFile->getPathname());
-        $type = $uploadedFile->getMimeType() ?? $uploadedFile->getClientMimeType();
+        $mime = $uploadedFile->getMimeType() ?? $uploadedFile->getClientMimeType();
 
         $name = explode('.', $name);
         array_pop($name);
         $name = implode('.', $name);
 
-        $file = $this->createFile($name, $ext, $type, $targetFolder);
+        $file = $this->createFile($name, $ext, $mime, $targetFolder);
 
         $this->fileSizeService->assertWorkspaceSizeCapacity(
             $file->getWorkspace(),

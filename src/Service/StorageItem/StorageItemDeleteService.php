@@ -11,24 +11,27 @@ use Symfony\Component\Filesystem\Filesystem;
 class StorageItemDeleteService
 {
     public function __construct(
-        private readonly string                 $workspacePath,
+        private readonly string $workspacePath,
         private readonly EntityManagerInterface $entityManager,
-        private readonly Filesystem             $filesystem
-    )
-    {
+        private readonly Filesystem $filesystem
+    ) {
     }
 
     public function deleteStorageItem(StorageItemInterface $item, $withFile = true): void
     {
-        if ($withFile) $this->filesystem->remove($this->workspacePath . "/" . $item->getPath());
+        if ($withFile) {
+            $this->filesystem->remove($this->workspacePath . "/" . $item->getPath());
 
-        if ($item instanceof File && $withFile) {
-            $this->filesystem->remove($this->workspacePath . "/" . $item->getPreviewPath());
+            if ($item instanceof File) {
+                $this->filesystem->remove($this->workspacePath . "/" . $item->getPreviewPath());
+            }
         }
 
+
         if ($item instanceof Folder) {
-            $children = array_merge($item->getFiles()->toArray(), $item->getFolders()->toArray());
-            foreach ($children as $c) $this->deleteStorageItem($c, false);
+            foreach ($item->getItems()->toArray() as $children) {
+                $this->deleteStorageItem($children, false);
+            }
         }
 
         $this->entityManager->remove($item);

@@ -84,7 +84,7 @@ class FileFactoryTest extends WebTestCase
 
         $this->assertEquals($name, $file->getName());
         $this->assertEquals($ext, $file->getExt());
-        $this->assertEquals($type, $file->getType());
+        $this->assertEquals($type, $file->getMime());
 
         $this->assertEquals($folder, $file->getFolder());
         $this->assertEquals($folder->getWorkspace(), $file->getWorkspace());

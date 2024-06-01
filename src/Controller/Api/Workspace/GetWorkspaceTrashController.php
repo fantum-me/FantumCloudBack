@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Entity\Workspace;
 use App\Repository\FileRepository;
 use App\Repository\FolderRepository;
+use App\Repository\StorageItemRepository;
 use App\Service\PermissionService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,18 +20,14 @@ class GetWorkspaceTrashController extends AbstractController
         Workspace $workspace,
         #[CurrentUser] User $user,
         PermissionService $permissionService,
-        FolderRepository $folderRepository,
-        FileRepository $fileRepository
+        StorageItemRepository $storageItemRepository,
     ): JsonResponse {
         $permissionService->assertAccess($user, $workspace);
 
-        $res = [
-            "files" => $fileRepository->findBy(["workspace" => $workspace, "inTrash" => true]),
-            "folders" => $folderRepository->findBy(["workspace" => $workspace, "inTrash" => true]),
-        ];
+        $items = $storageItemRepository->findBy(["workspace" => $workspace, "inTrash" => true]);
 
-        return $this->json($res, 200, [], [
-            "groups" => ["default", "file_details", "folder_details", "folder_parents"]
+        return $this->json($items, 200, [], [
+            "groups" => ["default", "item_details", "item_parents"]
         ]);
     }
 }

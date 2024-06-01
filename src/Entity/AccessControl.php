@@ -3,7 +3,7 @@
 namespace App\Entity;
 
 use App\Entity\Abstract\AbstractPermissionManager;
-use App\Entity\Interface\StorageItemInterface;
+use App\Entity\StorageItem;
 use App\Repository\AccessControlRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Ignore;
@@ -18,11 +18,7 @@ class AccessControl extends AbstractPermissionManager
 
     #[ORM\ManyToOne(inversedBy: 'accessControls')]
     #[Ignore]
-    private ?File $file = null;
-
-    #[ORM\ManyToOne(inversedBy: 'accessControls')]
-    #[Ignore]
-    private ?Folder $folder = null;
+    private ?StorageItem $item = null;
 
     public function getRole(): ?Role
     {
@@ -36,16 +32,14 @@ class AccessControl extends AbstractPermissionManager
         return $this;
     }
 
-    #[Ignore]
-    public function getItem(): StorageItemInterface
+    public function getItem(): ?StorageItem
     {
-        return $this->folder ?? $this->file;
+        return $this->item;
     }
 
-    public function setItem(StorageItemInterface $item): static
+    public function setItem(StorageItem $item): static
     {
-        if ($item instanceof Folder) $this->folder = $item;
-        elseif ($item instanceof File) $this->file = $item;
+        $this->item = $item;
         return $this;
     }
 }

@@ -37,7 +37,7 @@ class InsertFolderController extends AbstractController
         $entityManager->flush();
 
         return $this->json($folder, 200, [], [
-            'groups' => ["default", "folder_details", "folder_parents"]
+            'groups' => ["default", "item_details", "item_parents"]
         ]);
     }
 }

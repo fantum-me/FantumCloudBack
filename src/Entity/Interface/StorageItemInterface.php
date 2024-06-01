@@ -8,7 +8,7 @@ use App\Entity\Workspace;
 use DateTimeInterface;
 use Doctrine\Common\Collections\Collection;
 
-interface StorageItemInterface extends UidInterface
+interface StorageItemInterface
 {
     public function getFolder(): ?Folder;
 

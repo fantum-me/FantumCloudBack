@@ -31,9 +31,9 @@ class FilePreviewService
             $filePath = $this->workspacePath . "/" . $file->getPath();
             $previewPath = $this->workspacePath . "/" . $file->getPreviewPath();
 
-            if (str_starts_with($file->getType(), 'image')) $this->generateThumbnail($filePath, $previewPath);
-            elseif ($file->getType() === "application/pdf") $this->generateThumbnail($filePath . "[0]", $previewPath);
-            elseif (DocumentConverter::isMimeTypeValid($file->getType())) $this->documentToThumbnail($filePath, $previewPath);
+            if (str_starts_with($file->getMime(), 'image')) $this->generateThumbnail($filePath, $previewPath);
+            elseif ($file->getMime() === "application/pdf") $this->generateThumbnail($filePath . "[0]", $previewPath);
+            elseif (DocumentConverter::isMimeTypeValid($file->getMime())) $this->documentToThumbnail($filePath, $previewPath);
 
         } catch (Exception $e) {
             $this->logger->critical($e->getMessage());

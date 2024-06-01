@@ -21,7 +21,7 @@ class GetFolderController extends AbstractController
     ): JsonResponse {
         $permissionService->assertPermission($user, Permission::READ, $folder);
         return $this->json($folder, 200, [], [
-            'groups' => ["default", "folder_details", "folder_parents", "folder_children"]
+            'groups' => ["default", "item_details", "item_parents", "folder_children"]
         ]);
     }
 }

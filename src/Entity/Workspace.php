@@ -15,13 +15,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: WorkspaceRepository::class)]
 class Workspace extends AbstractUid
 {
-    #[ORM\OneToMany(mappedBy: 'workspace', targetEntity: File::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'workspace', targetEntity: StorageItem::class, orphanRemoval: true)]
     #[Ignore]
-    private Collection $files;
-
-    #[Ignore]
-    #[ORM\OneToMany(mappedBy: 'workspace', targetEntity: Folder::class, orphanRemoval: true)]
-    private Collection $folders;
+    private Collection $items;
 
     #[Ignore]
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
@@ -54,8 +50,7 @@ class Workspace extends AbstractUid
     public function __construct()
     {
         parent::__construct();
-        $this->files = new ArrayCollection();
-        $this->folders = new ArrayCollection();
+        $this->items = new ArrayCollection();
         $this->invites = new ArrayCollection();
         $this->members = new ArrayCollection();
         $this->roles = new ArrayCollection();
@@ -63,59 +58,29 @@ class Workspace extends AbstractUid
 
 
     /**
-     * @return Collection<int, File>
+     * @return Collection<int, StorageItem>
      */
-    public function getFiles(): Collection
+    public function getItems(): Collection
     {
-        return $this->files;
+        return $this->items;
     }
 
-    public function addFile(File $file): static
+    public function addItem(StorageItem $item): static
     {
-        if (!$this->files->contains($file)) {
-            $this->files->add($file);
-            $file->setWorkspace($this);
+        if (!$this->items->contains($item)) {
+            $this->items->add($item);
+            $item->setWorkspace($this);
         }
 
         return $this;
     }
 
-    public function removeFile(File $file): static
+    public function removeItem(StorageItem $item): static
     {
-        if ($this->files->removeElement($file)) {
+        if ($this->items->removeElement($item)) {
             // set the owning side to null (unless already changed)
-            if ($file->getWorkspace() === $this) {
-                $file->setWorkspace(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Folder>
-     */
-    public function getFolders(): Collection
-    {
-        return $this->folders;
-    }
-
-    public function addFolder(Folder $folder): static
-    {
-        if (!$this->folders->contains($folder)) {
-            $this->folders->add($folder);
-            $folder->setWorkspace($this);
-        }
-
-        return $this;
-    }
-
-    public function removeFolder(Folder $folder): static
-    {
-        if ($this->folders->removeElement($folder)) {
-            // set the owning side to null (unless already changed)
-            if ($folder->getWorkspace() === $this) {
-                $folder->setWorkspace(null);
+            if ($item->getWorkspace() === $this) {
+                $item->setWorkspace(null);
             }
         }
 

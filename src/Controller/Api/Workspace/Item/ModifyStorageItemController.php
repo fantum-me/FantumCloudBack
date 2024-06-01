@@ -94,7 +94,7 @@ class ModifyStorageItemController extends AbstractController
         $entityManager->flush();
 
         return $this->json($items, 200, [], [
-            "groups" => ["default", "file_details", "folder_details"]
+            "groups" => ["default", "item_details"]
         ]);
     }
 }
