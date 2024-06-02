@@ -10,15 +10,15 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
-        documents_api:
-            pattern: ^/api/documents
+        private_api: # Authorization is managed on the controller side
+            pattern: ^/api/private
         main:
             provider: app_user_provider
             access_token:
                 token_handler: App\Security\AccessTokenHandler
 
     access_control:
-        - { path: ^/api/documents, roles: PUBLIC_ACCESS }
+        - { path: ^/api/private, roles: PUBLIC_ACCESS } # Authorization is managed on the controller side
         - { path: ^/api, roles: ROLE_USER }
         # - { path: ^/admin, roles: ROLE_ADMIN }
 

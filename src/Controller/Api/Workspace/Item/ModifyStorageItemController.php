@@ -35,25 +35,23 @@ class ModifyStorageItemController extends AbstractController
     ): JsonResponse {
         $permissionService->assertAccess($user, $workspace);
 
-        [$files, $folders] = RequestHandler::getTwoRequestParameters($request, "files", "folders");
+        $itemIds = RequestHandler::getRequestParameter($request, "items", true);
+
         $items = [];
-
-        if ($files) {
-            foreach ($files as $id) {
-                $items[] = $storageItemService->getStorageItem(File::class, $id);
-            }
-        }
-        if ($folders) {
-            foreach ($folders as $id) {
-                $items[] = $storageItemService->getStorageItem(Folder::class, $id);
-            }
+        foreach ($itemIds as $id) {
+            $item = $storageItemService->getStorageItem($id);
+            $storageItemService->assertInWorkspace($workspace, $item);
+            $items[] = $item;
         }
 
+        $name = RequestHandler::getRequestParameter($request, "name");
         $inTrash = RequestHandler::getRequestParameter($request, "in_trash");
 
-        $parent = RequestHandler::getRequestParameter($request, "parent_id");
-        if ($parent) {
-            $parent = $storageItemService->getStorageItem(Folder::class, $parent);
+        $parentId = RequestHandler::getRequestParameter($request, "parent_id");
+        if ($parentId) {
+            $parent = $storageItemService->getStorageItem($parentId);
+            $parent = $storageItemService->assertFolder($parent);
+            $storageItemService->assertInWorkspace($workspace, $parent);
             $permissionService->assertPermission($user, Permission::WRITE, $parent);
             if ($parent->isInTrash()) {
                 throw new BadRequestHttpException("parent folder is in trash");
@@ -62,7 +60,11 @@ class ModifyStorageItemController extends AbstractController
 
         foreach ($items as $item) {
             $item->updateVersion();
-            if ($parent) {
+            if ($name) {
+                $permissionService->assertPermission($user, Permission::WRITE, $item);
+                $item->setName($name);
+            }
+            if ($parentId && $parent) {
                 if ($item->isInTrash()) {
                     throw new BadRequestHttpException(
                         EntityTypeMapper::getNameFromClass($item::class) . " " . $item->getId() . " is in trash"

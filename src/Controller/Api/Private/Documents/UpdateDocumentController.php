@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Api\Documents;
+namespace App\Controller\Api\Private\Documents;
 
 use App\Entity\File;
 use App\Service\DocumentsApiService;
@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class UpdateDocumentController extends AbstractController
 {
-    #[Route('/api/documents/{id}', "api_documents_update", methods: "POST")]
+    #[Route('/api/private/documents/{id}', "api_documents_update", methods: "POST")]
     public function update(
         File $file,
         Request $request,

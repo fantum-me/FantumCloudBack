@@ -34,27 +34,19 @@ class DeleteStorageItemController extends AbstractController
     ): Response {
         $permissionService->assertAccess($user, $workspace);
 
-        [$files, $folders] = RequestHandler::getTwoRequestParameters($request, "files", "folders");
-        $items = [];
+        $itemIds = RequestHandler::getRequestParameter($request, "items", true);
 
-        if ($files) {
-            foreach ($files as $id) {
-                $items[] = $storageItemService->getStorageItem(File::class, $id);
-            }
-        }
-        if ($folders) {
-            foreach ($folders as $id) {
-                $items[] = $storageItemService->getStorageItem(Folder::class, $id);
-            }
-        }
+        foreach ($itemIds as $id) {
+            $item = $storageItemService->getStorageItem($id);
+            $storageItemService->assertInWorkspace($workspace, $item);
+            $permissionService->assertPermission($user, Permission::DELETE, $item);
 
-        foreach ($items as $item) {
             if (!$item->isInTrash()) {
                 throw new BadRequestHttpException(
                     EntityTypeMapper::getNameFromClass($item::class) . " " . $item->getId() . " not in trash"
                 );
             }
-            $permissionService->assertPermission($user, Permission::DELETE, $item);
+
             $itemDeleteService->deleteStorageItem($item);
         }
 

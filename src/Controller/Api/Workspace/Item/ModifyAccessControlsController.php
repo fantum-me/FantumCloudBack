@@ -38,18 +38,14 @@ class ModifyAccessControlsController extends AbstractController
         LoggerInterface $logger,
         UserAccessNormalizer $userAccessNormalizer
     ): JsonResponse {
+        $permissionService->assertAccess($user, $workspace);
         $member = $user->getWorkspaceMember($workspace);
         $memberPosition = $member->getRoles()->get(0)->getPosition();
-        $permissionService->assertAccess($user, $workspace);
 
         $access = $userAccessNormalizer->normalize($member, context: ["resource" => $workspace]);
 
-        $item = $storageItemService->getStorageItem(File::class, $id, false)
-            ?? $storageItemService->getStorageItem(Folder::class, $id, false);
-        if (!$item) {
-            throw new BadRequestHttpException('Invalid item ID');
-        }
-
+        $item = $storageItemService->getStorageItem($id);
+        $storageItemService->assertInWorkspace($workspace, $item);
         $permissionService->assertPermission($user, Permission::EDIT_PERMISSIONS, $item);
 
         $accessControls = RequestHandler::getRequestParameter($request, "access_controls", true);

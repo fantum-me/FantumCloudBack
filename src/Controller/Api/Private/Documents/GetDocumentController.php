@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Api\Documents;
+namespace App\Controller\Api\Private\Documents;
 
 use App\Entity\File;
 use App\Service\DocumentsApiService;
@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class GetDocumentController extends AbstractController
 {
-    #[Route('/api/documents/{id}', "api_documents_get", methods: "GET")]
+    #[Route('/api/private/documents/{id}', "api_documents_get", methods: "GET")]
     public function get(
         File $file,
         Request $request,
