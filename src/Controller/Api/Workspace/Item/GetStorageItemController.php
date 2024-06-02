@@ -2,7 +2,6 @@
 
 namespace App\Controller\Api\Workspace\Item;
 
-use App\Entity\Folder;
 use App\Entity\StorageItem;
 use App\Entity\User;
 use App\Entity\Workspace;

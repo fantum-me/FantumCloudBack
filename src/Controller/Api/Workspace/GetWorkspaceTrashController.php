@@ -4,8 +4,6 @@ namespace App\Controller\Api\Workspace;
 
 use App\Entity\User;
 use App\Entity\Workspace;
-use App\Repository\FileRepository;
-use App\Repository\FolderRepository;
 use App\Repository\StorageItemRepository;
 use App\Service\PermissionService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

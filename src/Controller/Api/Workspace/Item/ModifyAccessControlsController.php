@@ -3,8 +3,6 @@
 namespace App\Controller\Api\Workspace\Item;
 
 use App\Entity\AccessControl;
-use App\Entity\File;
-use App\Entity\Folder;
 use App\Entity\User;
 use App\Entity\Workspace;
 use App\Repository\RoleRepository;

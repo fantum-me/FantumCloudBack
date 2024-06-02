@@ -2,13 +2,10 @@
 
 namespace App\Service\StorageItem;
 
-use App\Entity\File;
 use App\Entity\Folder;
 use App\Entity\StorageItem;
 use App\Entity\Workspace;
 use App\Repository\StorageItemRepository;
-use App\Utils\EntityTypeMapper;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class StorageItemService

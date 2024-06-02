@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Entity\Abstract\AbstractPermissionManager;
-use App\Entity\StorageItem;
 use App\Repository\AccessControlRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Ignore;

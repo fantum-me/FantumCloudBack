@@ -2,8 +2,6 @@
 
 namespace App\Controller\Api\Workspace\Item;
 
-use App\Entity\File;
-use App\Entity\Folder;
 use App\Entity\User;
 use App\Entity\Workspace;
 use App\Security\Permission;
@@ -90,8 +88,8 @@ class ModifyStorageItemController extends AbstractController
             }
         }
 
-        if ($parent) {
-            $parent->updateVersion();
+        if ($parentId) {
+            $parent?->updateVersion();
         }
         $entityManager->flush();
 

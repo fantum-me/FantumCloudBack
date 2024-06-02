@@ -2,7 +2,6 @@
 
 namespace App\Controller\Api\Workspace\File;
 
-use App\Entity\Folder;
 use App\Entity\User;
 use App\Entity\Workspace;
 use App\Factory\FileFactory;
