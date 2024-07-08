@@ -19,6 +19,6 @@ class GetDocumentController extends AbstractController
     ): BinaryFileResponse {
         $docsApiService->assertAuthentication($request);
         $path = $this->getParameter('workspace_path') . "/" . $file->getPath();
-        return $this->file($path, $file->getName() . "." . $file->getExt());
+        return $this->file($path, $file->getName());
     }
 }

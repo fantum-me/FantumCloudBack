@@ -67,6 +67,10 @@ abstract class StorageItem extends AbstractUid implements StorageItemInterface
         return $this->name;
     }
 
+    public function getFullSystemFileName(): ?string
+    {
+        return $this->getSystemFileName();
+    }
     public function setName(string $name): static
     {
         $this->name = $name;
@@ -77,11 +81,6 @@ abstract class StorageItem extends AbstractUid implements StorageItemInterface
     public function getSystemFileName(): ?string
     {
         return $this->id;
-    }
-
-    public function getFullSystemFileName(): ?string
-    {
-        return $this->getSystemFileName();
     }
 
     public function getPath(): ?string

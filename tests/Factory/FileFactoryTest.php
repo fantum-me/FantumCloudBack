@@ -47,15 +47,14 @@ class FileFactoryTest extends WebTestCase
         );
     }
 
-    public function getUploadedFile(string $name, string $ext, string $type): UploadedFile
+    public function getUploadedFile(string $name, string $type): UploadedFile
     {
         $path = __DIR__ . "/../fixtures/document.pdf"; // unused
         $uploadedFile = $this->getMockBuilder(UploadedFile::class)
             ->setConstructorArgs([$path, $name])
             ->getMock();
 
-        $uploadedFile->method("getClientOriginalName")->willReturn($name . "." . $ext);
-        $uploadedFile->method("getClientOriginalExtension")->willReturn($ext);
+        $uploadedFile->method("getClientOriginalName")->willReturn($name);
         $uploadedFile->method("getClientMimeType")->willReturn($type);
         $uploadedFile->method("getPathname")->willReturn($path);
 
@@ -72,10 +71,9 @@ class FileFactoryTest extends WebTestCase
 
     public function testCreateValidFileFromUpload(): void
     {
-        $name = "document";
-        $ext = "pdf";
+        $name = "document.pdf";
         $type = "application/pdf";
-        $uploadedFile = $this->getUploadedFile($name, $ext, $type);
+        $uploadedFile = $this->getUploadedFile($name, $type);
         $folder = $this->getFakeFolder();
 
         $file = $this->fileFactory->createFileFromUpload($uploadedFile, $folder);
@@ -83,7 +81,6 @@ class FileFactoryTest extends WebTestCase
         $this->assertInstanceOf(File::class, $file);
 
         $this->assertEquals($name, $file->getName());
-        $this->assertEquals($ext, $file->getExt());
         $this->assertEquals($type, $file->getMime());
 
         $this->assertEquals($folder, $file->getFolder());
@@ -92,7 +89,7 @@ class FileFactoryTest extends WebTestCase
 
     public function testCreateInvalidFile(): void
     {
-        $uploadedFile = $this->getUploadedFile("name", "ext", "type");
+        $uploadedFile = $this->getUploadedFile("name", "type");
         $folder = $this->getFakeFolder();
 
         $violation = new ConstraintViolation('Validation error message', null, [], null, null, null);

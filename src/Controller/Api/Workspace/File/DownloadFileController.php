@@ -28,6 +28,6 @@ class DownloadFileController extends AbstractController
         $storageItemService->assertInWorkspace($workspace, $file);
         $permissionService->assertPermission($user, Permission::READ, $file);
         $path = $this->getParameter('workspace_path') . "/" . $file->getPath();
-        return $this->file($path, $file->getName() . "." . $file->getExt());
+        return $this->file($path, $file->getName());
     }
 }

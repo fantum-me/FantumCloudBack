@@ -24,11 +24,10 @@ class FileFactory
     ) {
     }
 
-    public function createFile(string $name, string $ext, string $mime, Folder $targetFolder): File
+    public function createFile(string $name, string $mime, Folder $targetFolder): File
     {
         $file = new File();
         $file->setName($name)
-            ->setExt($ext)
             ->setMime($mime)
             ->setWorkspace($targetFolder->getWorkspace())
             ->setFolder($targetFolder)
@@ -50,15 +49,10 @@ class FileFactory
     public function createFileFromUpload(UploadedFile $uploadedFile, Folder $targetFolder): File
     {
         $name = $uploadedFile->getClientOriginalName();
-        $ext = $uploadedFile->getClientOriginalExtension();
         $content = file_get_contents($uploadedFile->getPathname());
         $mime = $uploadedFile->getMimeType() ?? $uploadedFile->getClientMimeType();
 
-        $name = explode('.', $name);
-        array_pop($name);
-        $name = implode('.', $name);
-
-        $file = $this->createFile($name, $ext, $mime, $targetFolder);
+        $file = $this->createFile($name, $mime, $targetFolder);
 
         $this->fileSizeService->assertWorkspaceSizeCapacity(
             $file->getWorkspace(),

@@ -46,9 +46,8 @@ class InsertStorageItemController extends AbstractController
         $permissionService->assertPermission($user, Permission::WRITE, $parent);
 
         if ($type === "file") {
-            $ext = RequestHandler::getRequestParameter($request, "ext", true);
             $mime = RequestHandler::getRequestParameter($request, "mime", true);
-            $item = $fileFactory->createFile($name, $ext, $mime, $parent);
+            $item = $fileFactory->createFile($name, $mime, $parent);
         } elseif ($type === "folder") {
             $item = $folderFactory->createFolder($name, $parent);
         } else {

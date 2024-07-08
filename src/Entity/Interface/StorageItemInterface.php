@@ -22,8 +22,6 @@ interface StorageItemInterface
 
     public function setName(string $name): static;
 
-    public function getFullSystemFileName(): ?string;
-
     public function getSystemFileName(): ?string;
 
     public function getPath(): ?string;
