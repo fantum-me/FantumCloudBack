@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Entity\Abstract;
+namespace App\Entity\Trait;
 
-use App\Entity\Interface\UidInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\MappedSuperclass]
-abstract class AbstractUid implements UidInterface
+trait UidTrait
 {
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]

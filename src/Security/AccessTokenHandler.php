@@ -2,7 +2,7 @@
 
 namespace App\Security;
 
-use App\Factory\UserFactory;
+use App\Domain\User\UserFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
@@ -32,7 +32,9 @@ class AccessTokenHandler implements AccessTokenHandlerInterface
             ]
         );
 
-        if ($response->getStatusCode() !== 200) throw new BadCredentialsException('Invalid credentials.');
+        if ($response->getStatusCode() !== 200) {
+            throw new BadCredentialsException('Invalid credentials.');
+        }
 
         $data = $response->toArray();
 

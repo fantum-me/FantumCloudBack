@@ -44,6 +44,6 @@ class DocumentConverter
             rmdir($tempOutputDir);
         }
 
-        return (bool) $success;
+        return (bool)$success;
     }
 }

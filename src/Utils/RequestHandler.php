@@ -7,6 +7,16 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class RequestHandler
 {
+    public static function getTwoRequestParameters(Request $request, string $first, string $second): array
+    {
+        $firstValue = static::getRequestParameter($request, $first);
+        $secondValue = static::getRequestParameter($request, $second);
+        if (!$firstValue && !$secondValue) {
+            throw new BadRequestHttpException("at least $first or $second are required");
+        }
+        return [$firstValue, $secondValue];
+    }
+
     public static function getRequestParameter(Request $request, string $parameter, bool $required = false): mixed
     {
         if ($request->getMethod() === Request::METHOD_GET) {
@@ -21,14 +31,5 @@ class RequestHandler
             }
             return key_exists($parameter, $body) ? $body[$parameter] : null;
         }
-    }
-
-    public static function getTwoRequestParameters(Request $request, string $first, string $second): array {
-        $firstValue = static::getRequestParameter($request, $first);
-        $secondValue = static::getRequestParameter($request, $second);
-        if (!$firstValue && !$secondValue) {
-            throw new BadRequestHttpException("at least $first or $second are required");
-        }
-        return [$firstValue, $secondValue];
     }
 }
