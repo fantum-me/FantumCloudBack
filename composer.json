@@ -23,6 +23,7 @@
         "symfony/framework-bundle": "6.4.*",
         "symfony/http-client": "6.4.*",
         "symfony/maker-bundle": "^1.51",
+        "symfony/mercure-bundle": "^0.3.9",
         "symfony/mime": "6.4.*",
         "symfony/property-access": "6.4.*",
         "symfony/property-info": "6.4.*",

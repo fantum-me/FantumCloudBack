@@ -56,6 +56,7 @@ class InsertStorageItemController extends AbstractController
             throw new BadRequestHttpException("type need be either 'file' or 'folder'");
         }
 
+        $parent->updateVersion();
         $entityManager->flush();
 
         return $this->json($item, 200, [], [

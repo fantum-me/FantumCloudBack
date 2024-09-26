@@ -11,6 +11,7 @@ use App\Domain\User\User;
 use App\Security\Permission;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
@@ -22,7 +23,8 @@ class StorageItemNormalizer implements NormalizerInterface
         private readonly UserAccessNormalizer         $userAccessNormalizer,
         private readonly string                       $workspacePath,
         private readonly StorageItemPermissionService $itemPermissionService,
-        private readonly Filesystem                   $filesystem
+        private readonly Filesystem                   $filesystem,
+        private readonly HubInterface $mercureHub
     )
     {
     }
@@ -60,6 +62,12 @@ class StorageItemNormalizer implements NormalizerInterface
         } elseif ($object instanceof Folder) {
             $data["type"] = "folder";
             $data["is_root"] = $object->getFolder() === null;
+
+
+
+            $data["version_update_topic"] = "folder-version/" . $object->getId()->toRfc4122();
+            $data["version_update_url"] = $this->mercureHub->getUrl() . "?topic=" . $data["version_update_topic"];
+            $data["version_update_token"] = $this->mercureHub->getFactory()->create([$data["version_update_topic"]]);
 
             if (isset($context["groups"]) && in_array("folder_children", $context["groups"])) {
                 $this->addChildrenToData(
