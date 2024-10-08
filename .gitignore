@@ -1,11 +1,17 @@
-.env.local
-/vendor/
-/var/
 /data/
 /.idea/
-/public/bundles/
 
-###> phpunit/phpunit ###
-/phpunit.xml
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+###> symfony/phpunit-bridge ###
 .phpunit.result.cache
-###< phpunit/phpunit ###
+/phpunit.xml
+###< symfony/phpunit-bridge ###
