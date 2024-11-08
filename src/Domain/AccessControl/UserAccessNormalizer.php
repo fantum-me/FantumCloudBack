@@ -99,4 +99,12 @@ class UserAccessNormalizer implements NormalizerInterface
                 || $context["resource"] instanceof Workspace
             );
     }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            User::class,
+            Member::class,
+        ];
+    }
 }

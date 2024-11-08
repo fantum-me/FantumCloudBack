@@ -5,10 +5,11 @@ namespace App\Domain\StorageItem;
 use App\Domain\AccessControl\AccessControl;
 use App\Domain\Folder\Folder;
 use App\Domain\Workspace\Workspace;
+use App\Entity\Interface\UidInterface;
 use DateTimeInterface;
 use Doctrine\Common\Collections\Collection;
 
-interface StorageItemInterface
+interface StorageItemInterface extends UidInterface
 {
     public function getFolder(): ?Folder;
 

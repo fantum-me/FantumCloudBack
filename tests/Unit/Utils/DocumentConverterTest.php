@@ -34,7 +34,7 @@ class DocumentConverterTest extends TestCase
 
     public function testConvertDocxToPdf()
     {
-        $filePath = __DIR__ . '/../../fixtures/example.docx';
+        $filePath = __DIR__ . '/../../fixtures/document.docx';
         $outputPath = $this->tempDir . '/output.pdf';
 
         $success = DocumentConverter::convertToPdf($filePath, $outputPath);
