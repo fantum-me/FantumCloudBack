@@ -3,13 +3,16 @@
 namespace App\Domain\Folder;
 
 use App\Domain\File\FileSizeService;
+use App\Domain\StorageItem\StorageItem;
+use App\Domain\StorageItem\StorageItemFactoryInterface;
 use App\Domain\Workspace\Workspace;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class FolderFactory
+class FolderFactory implements StorageItemFactoryInterface
 {
     public function __construct(
         private readonly string                 $workspacePath,
@@ -19,6 +22,11 @@ class FolderFactory
         private readonly FileSizeService        $fileSizeService
     )
     {
+    }
+
+    public function handleInsertRequest(Request $request, string $name, Folder $parent): StorageItem
+    {
+        return $this->createFolder($name, $parent);
     }
 
     public function createFolder(string $name, Folder|Workspace $parent): Folder
@@ -45,5 +53,10 @@ class FolderFactory
         $this->entityManager->persist($folder);
 
         return $folder;
+    }
+
+    public function getSupportedTypes(): array
+    {
+        return [Folder::class];
     }
 }

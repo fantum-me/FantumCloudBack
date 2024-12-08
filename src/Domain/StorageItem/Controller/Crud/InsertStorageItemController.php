@@ -2,10 +2,9 @@
 
 namespace App\Domain\StorageItem\Controller\Crud;
 
-use App\Domain\File\FileFactory;
-use App\Domain\Folder\FolderFactory;
 use App\Domain\StorageItem\Service\StorageItemPermissionService;
 use App\Domain\StorageItem\Service\StorageItemService;
+use App\Domain\StorageItem\StorageItemTypeProvider;
 use App\Domain\User\User;
 use App\Domain\Workspace\Service\WorkspacePermissionService;
 use App\Domain\Workspace\Workspace;
@@ -27,12 +26,11 @@ class InsertStorageItemController extends AbstractController
         Request                                    $request,
         #[MapEntity(id: 'workspace_id')] Workspace $workspace,
         #[CurrentUser] User                        $user,
-        FolderFactory                              $folderFactory,
-        FileFactory                                $fileFactory,
         EntityManagerInterface                     $entityManager,
         StorageItemService                         $storageItemService,
         WorkspacePermissionService                 $workspacePermissionService,
-        StorageItemPermissionService               $itemPermissionService
+        StorageItemPermissionService               $itemPermissionService,
+        StorageItemTypeProvider                    $storageItemTypeProvider,
     ): Response
     {
         $workspacePermissionService->assertAccess($user, $workspace);
@@ -47,14 +45,12 @@ class InsertStorageItemController extends AbstractController
         $storageItemService->assertInWorkspace($workspace, $parent);
         $itemPermissionService->assertPermission($user, Permission::WRITE, $parent);
 
-        if ($type === "file") {
-            $mime = RequestHandler::getRequestParameter($request, "mime", true);
-            $item = $fileFactory->createFile($name, $mime, $parent);
-        } elseif ($type === "folder") {
-            $item = $folderFactory->createFolder($name, $parent);
-        } else {
-            throw new BadRequestHttpException("type need be either 'file' or 'folder'");
-        }
+        if (!array_key_exists($type, StorageItemTypeProvider::TYPES))
+            throw new BadRequestHttpException("invalid storage item type.");
+
+        $type = StorageItemTypeProvider::TYPES[$type];
+        $factory = $storageItemTypeProvider->getFactory($type);
+        $item = $factory->handleInsertRequest($request, $name, $parent);
 
         $parent->updateVersion();
         $entityManager->flush();

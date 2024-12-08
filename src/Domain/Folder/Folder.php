@@ -12,7 +12,6 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 class Folder extends StorageItem
 {
     #[ORM\OneToMany(mappedBy: 'folder', targetEntity: StorageItem::class)]
-    #[Ignore]
     private Collection $items;
 
     public function __construct()

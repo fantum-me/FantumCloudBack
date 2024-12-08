@@ -3,7 +3,6 @@
 namespace App\Domain\StorageItem;
 
 use App\Domain\AccessControl\AccessControl;
-use App\Domain\File\File;
 use App\Domain\Folder\Folder;
 use App\Domain\Workspace\Workspace;
 use App\Entity\Trait\TimestampTrait;
@@ -18,9 +17,9 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: StorageItemRepository::class)]
-#[ORM\InheritanceType("SINGLE_TABLE")]
+#[ORM\InheritanceType("JOINED")]
 #[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
-#[ORM\DiscriminatorMap(["file" => File::class, "folder" => Folder::class])]
+#[ORM\DiscriminatorMap(StorageItemTypeProvider::DISCRIMINATOR_MAP)]
 #[ORM\HasLifecycleCallbacks]
 abstract class StorageItem implements StorageItemInterface
 {

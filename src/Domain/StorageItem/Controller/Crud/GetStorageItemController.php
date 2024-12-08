@@ -31,7 +31,7 @@ class GetStorageItemController extends AbstractController
         $storageItemService->assertInWorkspace($workspace, $item);
         $itemPermissionService->assertPermission($user, Permission::READ, $item);
         return $this->json($item, 200, [], [
-            'groups' => ["default", "item_details", "item_parents", "folder_children"]
+            'groups' => ["default", "item_details", "item_parents", "folder_children", "datatable_details"]
         ]);
     }
 }
