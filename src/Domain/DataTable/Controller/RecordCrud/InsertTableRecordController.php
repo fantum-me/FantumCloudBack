@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\DataTable\Controller;
+namespace App\Domain\DataTable\Controller\RecordCrud;
 
 use App\Domain\DataTable\Entity\DataTable;
 use App\Domain\DataTable\Entity\TableRecord;
@@ -32,7 +32,7 @@ class InsertTableRecordController extends AbstractController
         $storageItemPermissionService->assertPermission($user, Permission::WRITE, $dataTable);
 
         $record = new TableRecord();
-        $record->setDataTable($dataTable);
+        $dataTable->addRecord($record);
 
         $entityManager->persist($record);
         $entityManager->flush();

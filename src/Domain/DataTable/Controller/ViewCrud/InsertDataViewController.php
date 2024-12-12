@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Domain\DataTable\Controller;
+namespace App\Domain\DataTable\Controller\ViewCrud;
 
+use App\Domain\DataTable\DataTableViewType;
 use App\Domain\DataTable\Entity\DataTable;
-use App\Domain\DataTable\Entity\TableField;
-use App\Domain\DataTable\Service\TableFieldTypeService;
-use App\Domain\DataTable\TableFieldType;
+use App\Domain\DataTable\Entity\DataView;
 use App\Domain\StorageItem\Service\StorageItemPermissionService;
 use App\Domain\User\User;
 use App\Domain\Workspace\Service\WorkspacePermissionService;
@@ -22,9 +21,9 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class InsertTableFieldController extends AbstractController
+class InsertDataViewController extends AbstractController
 {
-    #[Route('/api/workspaces/{workspace_id}/databases/{id}/fields', name: 'api_workspaces_databases_fields_insert', methods: "POST")]
+    #[Route('/api/workspaces/{workspace_id}/databases/{id}/views', name: 'api_workspaces_databases_views_insert', methods: "POST")]
     public function insert(
         Request                                    $request,
         #[MapEntity(id: 'workspace_id')] Workspace $workspace,
@@ -39,32 +38,25 @@ class InsertTableFieldController extends AbstractController
         $workspacePermissionService->assertAccess($user, $workspace);
         $storageItemPermissionService->assertPermission($user, Permission::WRITE, $dataTable);
 
-        $field = new TableField();
-        $field->setDataTable($dataTable);
+        $view = new DataView();
+        $view->setCreatedBy($user->getWorkspaceMember($workspace));
+        $dataTable->addView($view);
 
         $name = RequestHandler::getRequestParameter($request, "name", true);
-        $field->setName($name);
+        $view->setName($name);
 
         $type = RequestHandler::getRequestParameter($request, "type", true);
-        if ($fieldType = TableFieldType::tryFrom($type)) $field->setType($fieldType);
+        if ($viewType = DataTableViewType::tryFrom($type)) $view->setType($viewType);
         else throw new BadRequestHttpException("invalid type $type");
 
-        if ($type === TableFieldType::SelectType) {
-            $options = RequestHandler::getRequestParameter($request, "options");
-            if ($options) {
-                if (TableFieldTypeService::isValidOptionsArray($options)) $field->setOptions($options);
-                else throw new BadRequestHttpException("invalid options array format");
-            } else $field->setOptions([]);
-        }
-
-        if (count($errors = $validator->validate($field)) > 0) {
+        if (count($errors = $validator->validate($view)) > 0) {
             throw new BadRequestHttpException($errors->get(0)->getMessage());
         }
 
-        $entityManager->persist($field);
+        $entityManager->persist($view);
         $entityManager->flush();
 
-        return $this->json($field, 200, [], [
+        return $this->json($view, 200, [], [
             'groups' => ["default", "datatable_details"]
         ]);
     }

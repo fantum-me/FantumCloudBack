@@ -2,15 +2,18 @@
 
 namespace App\Domain\DataTable\Entity;
 
-use App\Domain\DataTable\TableFieldType;
 use App\Domain\DataTable\Repository\TableFieldRepository;
+use App\Domain\DataTable\Service\TableFieldTypeService;
+use App\Domain\DataTable\TableFieldType;
 use App\Entity\Abstract\AbstractUid;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Context;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Serializer\Attribute\SerializedName;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
 #[ORM\Entity(repositoryClass: TableFieldRepository::class)]
 class TableField extends AbstractUid
@@ -40,7 +43,8 @@ class TableField extends AbstractUid
     private bool $isTitle = false;
 
     #[ORM\Column(type: 'json', nullable: true)]
-    #[Groups(["default"])]
+    // Check getSerializedOptions()
+    #[Ignore]
     private ?array $options = null;
 
     public function __construct()
@@ -71,6 +75,12 @@ class TableField extends AbstractUid
         $this->type = $type;
 
         return $this;
+    }
+
+    #[Groups(["default"])]
+    public function getDefaultValue(): string
+    {
+        return TableFieldTypeService::getDefaultEmptyValue($this);
     }
 
     /**
@@ -138,4 +148,15 @@ class TableField extends AbstractUid
 
         return $this;
     }
+
+    #[Groups(["default"])]
+    #[SerializedName("options")]
+    #[Context([AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS => true])]
+    public function getSerializedOptions(): object|array
+    {
+        // This ensure empty array serialized as json object
+        if (empty($this->options)) return (object)[];
+        else return $this->options;
+    }
+
 }

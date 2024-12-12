@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Domain\DataTable\Controller;
+namespace App\Domain\DataTable\Controller\ViewCrud;
 
 use App\Domain\DataTable\Entity\DataTable;
-use App\Domain\DataTable\Entity\TableField;
-use App\Domain\DataTable\Service\TableFieldTypeService;
-use App\Domain\DataTable\TableFieldType;
+use App\Domain\DataTable\Entity\DataView;
+use App\Domain\DataTable\Service\DataViewSettingsService;
 use App\Domain\StorageItem\Service\StorageItemPermissionService;
 use App\Domain\User\User;
 use App\Domain\Workspace\Service\WorkspacePermissionService;
@@ -22,16 +21,17 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class UpdateTableFieldController extends AbstractController
+class UpdateDataViewController extends AbstractController
 {
-    #[Route('/api/workspaces/{workspace_id}/databases/{database_id}/fields/{id}', name: 'api_workspaces_databases_fields_update', methods: "PATCH")]
+    #[Route('/api/workspaces/{workspace_id}/databases/{database_id}/views/{id}', name: 'api_workspaces_databases_views_update', methods: "PATCH")]
     public function update(
         Request                                    $request,
         #[CurrentUser] User                        $user,
         #[MapEntity(id: 'workspace_id')] Workspace $workspace,
         #[MapEntity(id: 'database_id')] DataTable  $dataTable,
-        TableField                                 $field,
+        DataView                                   $view,
         EntityManagerInterface                     $entityManager,
+        DataViewSettingsService                    $dataViewSettingsService,
         WorkspacePermissionService                 $workspacePermissionService,
         StorageItemPermissionService               $storageItemPermissionService,
         ValidatorInterface                         $validator
@@ -41,25 +41,23 @@ class UpdateTableFieldController extends AbstractController
         $storageItemPermissionService->assertPermission($user, Permission::WRITE, $dataTable);
 
         if ($name = RequestHandler::getRequestParameter($request, "name")) {
-            $field->setName($name);
+            $view->setName($name);
         }
 
-        if ($field->getType() === TableFieldType::SelectType) {
-            $options = RequestHandler::getRequestParameter($request, "options");
-            if ($options) {
-                if (TableFieldTypeService::isValidOptionsArray($options)) $field->setOptions($options);
-                else throw new BadRequestHttpException("invalid options array format");
-            } else $field->setOptions([]);
+        if ($fieldSettings = RequestHandler::getRequestParameter($request, "field_settings")) {
+            if (is_array($fieldSettings) && $dataViewSettingsService->validateFieldSettings($view, $fieldSettings)) {
+                $view->setFieldSettings($fieldSettings);
+            } else throw new BadRequestHttpException("field_settings is invalid");
         }
 
-        if (count($errors = $validator->validate($field)) > 0) {
+        if (count($errors = $validator->validate($view)) > 0) {
             throw new BadRequestHttpException($errors->get(0)->getMessage());
         }
 
-        $entityManager->persist($field);
+        $entityManager->persist($view);
         $entityManager->flush();
 
-        return $this->json($field, 200, [], [
+        return $this->json($view, 200, [], [
             'groups' => ["default", "datatable_details"]
         ]);
     }

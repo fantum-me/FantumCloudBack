@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Domain\DataTable\Controller;
+namespace App\Domain\DataTable\Controller\RecordCrud;
 
 use App\Domain\DataTable\Entity\DataTable;
-use App\Domain\DataTable\Entity\TableField;
+use App\Domain\DataTable\Entity\TableRecord;
 use App\Domain\StorageItem\Service\StorageItemPermissionService;
 use App\Domain\User\User;
 use App\Domain\Workspace\Service\WorkspacePermissionService;
@@ -13,18 +13,17 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
-class DeleteTableFieldController extends AbstractController
+class DeleteTableRecordController extends AbstractController
 {
-    #[Route('/api/workspaces/{workspace_id}/databases/{database_id}/fields/{id}', name: 'api_workspaces_databases_fields_delete', methods: "DELETE")]
+    #[Route('/api/workspaces/{workspace_id}/databases/{database_id}/records/{id}', name: 'api_workspaces_databases_records_delete', methods: "DELETE")]
     public function update(
         #[CurrentUser] User                        $user,
         #[MapEntity(id: 'workspace_id')] Workspace $workspace,
         #[MapEntity(id: 'database_id')] DataTable  $dataTable,
-        TableField                                 $field,
+        TableRecord                                $record,
         EntityManagerInterface                     $entityManager,
         WorkspacePermissionService                 $workspacePermissionService,
         StorageItemPermissionService               $storageItemPermissionService
@@ -33,9 +32,7 @@ class DeleteTableFieldController extends AbstractController
         $workspacePermissionService->assertAccess($user, $workspace);
         $storageItemPermissionService->assertPermission($user, Permission::WRITE, $dataTable);
 
-        if ($field->isTitle()) throw new AccessDeniedHttpException('Cannot delete title field.');
-
-        $entityManager->remove($field);
+        $entityManager->remove($record);
         $entityManager->flush();
 
         return new Response("done");

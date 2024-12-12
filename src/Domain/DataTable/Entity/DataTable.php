@@ -2,7 +2,6 @@
 
 namespace App\Domain\DataTable\Entity;
 
-use App\Domain\DataTable\DataTableViewType;
 use App\Domain\DataTable\Repository\DataTableRepository;
 use App\Domain\StorageItem\StorageItem;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -27,15 +26,19 @@ class DataTable extends StorageItem
     #[Groups(["datatable_details"])]
     private Collection $records;
 
-    #[ORM\Column(type: 'json')]
-    #[Groups(["default"])]
-    private array $views = [];
+    /**
+     * @var Collection<int, DataView>
+     */
+    #[ORM\OneToMany(mappedBy: 'dataTable', targetEntity: DataView::class, orphanRemoval: true)]
+    #[Groups(["datatable_details"])]
+    private Collection $views;
 
     public function __construct()
     {
         parent::__construct();
         $this->fields = new ArrayCollection();
         $this->records = new ArrayCollection();
+        $this->views = new ArrayCollection();
     }
 
     /**
@@ -98,14 +101,32 @@ class DataTable extends StorageItem
         return $this;
     }
 
-    public function getViews(): array
+    /**
+     * @return Collection<int, DataView>
+     */
+    public function getViews(): Collection
     {
-        return array_map(fn($view) => DataTableViewType::from($view), $this->views);
+        return $this->views;
     }
 
-    public function setViews(DataTableViewType ...$views): static
+    public function addView(DataView $view): static
     {
-        $this->views = array_unique(array_map(fn($view) => $view->value, $views));
+        if (!$this->views->contains($view)) {
+            $this->views->add($view);
+            $view->setDataTable($this);
+        }
+
+        return $this;
+    }
+
+    public function removeView(DataView $view): static
+    {
+        if ($this->views->removeElement($view)) {
+            // set the owning side to null (unless already changed)
+            if ($view->getDataTable() === $this) {
+                $view->setDataTable(null);
+            }
+        }
 
         return $this;
     }

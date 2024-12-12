@@ -2,11 +2,9 @@
 
 namespace App\Domain\DataTable\Serializer;
 
-use App\Domain\DataTable\Entity\DataTable;
 use App\Domain\DataTable\Entity\TableRecord;
 use App\Domain\DataTable\Entity\TableValue;
 use App\Domain\DataTable\Service\TableFieldTypeService;
-use App\Domain\StorageItem\StorageItemNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
