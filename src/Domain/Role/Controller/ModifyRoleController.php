@@ -3,11 +3,11 @@
 namespace App\Domain\Role\Controller;
 
 use App\Domain\Role\Role;
-use App\Domain\Role\Service\RolePositionService;
 use App\Domain\User\User;
 use App\Domain\Workspace\Service\WorkspacePermissionService;
 use App\Domain\Workspace\Workspace;
 use App\Security\Permission;
+use App\Service\PositionEntityService;
 use App\Utils\RequestHandler;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -28,7 +28,7 @@ class ModifyRoleController extends AbstractController
         #[MapEntity(id: 'workspace_id')] Workspace $workspace,
         #[MapEntity(id: 'id')] Role                $role,
         #[CurrentUser] User                        $user,
-        RolePositionService                        $rolePositionService,
+        PositionEntityService $positionEntityService,
         ValidatorInterface                         $validator,
         EntityManagerInterface                     $entityManager,
         WorkspacePermissionService                 $workspacePermissionService
@@ -61,7 +61,7 @@ class ModifyRoleController extends AbstractController
             if (!$member->isOwner() && $member->getRoles()[0]->getPosition() <= $position) {
                 throw new AccessDeniedHttpException();
             }
-            $rolePositionService->setRolePosition($role, $position);
+            $positionEntityService->setEntityPosition($role, "workspace", $position);
         }
 
         if (count($errors = $validator->validate($role)) > 0) {

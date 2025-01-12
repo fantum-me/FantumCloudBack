@@ -17,6 +17,7 @@ class DataTable extends StorageItem
      */
     #[ORM\OneToMany(mappedBy: 'dataTable', targetEntity: TableField::class, orphanRemoval: true)]
     #[Groups(["datatable_details"])]
+    #[ORM\OrderBy(["position" => "ASC"])]
     private Collection $fields;
 
     /**

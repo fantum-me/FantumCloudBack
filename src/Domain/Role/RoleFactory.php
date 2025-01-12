@@ -2,8 +2,8 @@
 
 namespace App\Domain\Role;
 
-use App\Domain\Role\Service\RolePositionService;
 use App\Domain\Workspace\Workspace;
+use App\Service\PositionEntityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class RoleFactory
 {
     public function __construct(
-        private readonly RolePositionService    $rolePositionService,
+        private readonly PositionEntityService $positionEntityService,
         private readonly EntityManagerInterface $entityManager,
         private readonly ValidatorInterface     $validator
     )
@@ -37,7 +37,7 @@ class RoleFactory
             $role->setPermission($permission, $value);
         }
 
-        $this->rolePositionService->setRolePosition($role, $position);
+        $this->positionEntityService->setEntityPosition($role, "workspace", $position);
 
         if (count($errors = $this->validator->validate($role)) > 0) {
             throw new BadRequestHttpException($errors->get(0)->getMessage());

@@ -11,6 +11,7 @@ use App\Domain\User\User;
 use App\Domain\Workspace\Service\WorkspacePermissionService;
 use App\Domain\Workspace\Workspace;
 use App\Security\Permission;
+use App\Service\PositionEntityService;
 use App\Utils\RequestHandler;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -30,6 +31,7 @@ class InsertTableFieldController extends AbstractController
         #[MapEntity(id: 'workspace_id')] Workspace $workspace,
         #[CurrentUser] User                        $user,
         DataTable                                  $dataTable,
+        PositionEntityService $positionEntityService,
         EntityManagerInterface                     $entityManager,
         WorkspacePermissionService                 $workspacePermissionService,
         StorageItemPermissionService               $storageItemPermissionService,
@@ -41,6 +43,7 @@ class InsertTableFieldController extends AbstractController
 
         $field = new TableField();
         $dataTable->addField($field);
+        $positionEntityService->setEntityPosition($field, "dataTable", $field->getDataTable()->getFields()->count() - 1);
 
         $name = RequestHandler::getRequestParameter($request, "name", true);
         $field->setName($name);
@@ -60,7 +63,6 @@ class InsertTableFieldController extends AbstractController
         if (count($errors = $validator->validate($field)) > 0) {
             throw new BadRequestHttpException($errors->get(0)->getMessage());
         }
-
 
         $entityManager->persist($field);
         $entityManager->flush();

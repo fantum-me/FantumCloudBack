@@ -40,7 +40,8 @@ class DataTableFactory implements StorageItemFactoryInterface
         $field = new TableField();
         $field->setName("Name")
             ->setType(TableFieldType::TextType)
-            ->setIsTitle(true);
+            ->setIsTitle(true)
+            ->setPosition(0);
 
         $datatable = new DataTable();
         $datatable->setName($name)

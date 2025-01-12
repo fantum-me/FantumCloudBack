@@ -6,6 +6,8 @@ use App\Domain\DataTable\Repository\TableFieldRepository;
 use App\Domain\DataTable\Service\TableFieldTypeService;
 use App\Domain\DataTable\TableFieldType;
 use App\Entity\Abstract\AbstractUid;
+use App\Entity\Interface\PositionEntityInterface;
+use App\Entity\Trait\PositionTrait;
 use App\Entity\Trait\TimestampTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -18,9 +20,10 @@ use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
 #[ORM\Entity(repositoryClass: TableFieldRepository::class)]
 #[ORM\HasLifecycleCallbacks]
-class TableField extends AbstractUid
+class TableField extends AbstractUid implements PositionEntityInterface
 {
     use TimestampTrait;
+    use PositionTrait;
 
     #[ORM\Column(length: 255)]
     #[Groups(["default"])]

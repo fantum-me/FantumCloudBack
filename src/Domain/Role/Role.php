@@ -6,6 +6,8 @@ use App\Domain\AccessControl\AccessControl;
 use App\Domain\Member\Member;
 use App\Domain\Workspace\Workspace;
 use App\Entity\Abstract\AbstractRolePermissionManager;
+use App\Entity\Interface\PositionEntityInterface;
+use App\Entity\Trait\PositionTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -14,8 +16,10 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: RoleRepository::class)]
-class Role extends AbstractRolePermissionManager
+class Role extends AbstractRolePermissionManager implements PositionEntityInterface
 {
+    use PositionTrait;
+
     #[ORM\Column(length: 31)]
     #[Assert\NotBlank]
     #[Assert\Length(max: 31)]
@@ -44,11 +48,6 @@ class Role extends AbstractRolePermissionManager
     #[ORM\Column]
     #[Groups(["default"])]
     private bool $isDefault = false;
-
-    #[ORM\Column]
-    #[Assert\PositiveOrZero]
-    #[Groups(["default"])]
-    private ?int $position = null;
 
     public function __construct()
     {
@@ -158,18 +157,6 @@ class Role extends AbstractRolePermissionManager
     public function setIsDefault(bool $isDefault): static
     {
         $this->isDefault = $isDefault;
-
-        return $this;
-    }
-
-    public function getPosition(): ?int
-    {
-        return $this->position;
-    }
-
-    public function setPosition(int $position): static
-    {
-        $this->position = $position;
 
         return $this;
     }
