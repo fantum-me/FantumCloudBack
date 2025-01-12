@@ -4,14 +4,18 @@ namespace App\Domain\DataTable\Entity;
 
 use App\Domain\DataTable\Repository\TableValueRepository;
 use App\Entity\Abstract\AbstractUid;
+use App\Entity\Trait\TimestampTrait;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 
 #[ORM\Entity(repositoryClass: TableValueRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class TableValue extends AbstractUid
 {
+    use TimestampTrait;
+
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(["default"])]
     private ?string $value = null;

@@ -6,6 +6,7 @@ use App\Domain\DataTable\Repository\TableFieldRepository;
 use App\Domain\DataTable\Service\TableFieldTypeService;
 use App\Domain\DataTable\TableFieldType;
 use App\Entity\Abstract\AbstractUid;
+use App\Entity\Trait\TimestampTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -16,8 +17,11 @@ use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
 #[ORM\Entity(repositoryClass: TableFieldRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class TableField extends AbstractUid
 {
+    use TimestampTrait;
+
     #[ORM\Column(length: 255)]
     #[Groups(["default"])]
     private ?string $name = null;

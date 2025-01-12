@@ -4,16 +4,18 @@ namespace App\Domain\DataTable\Entity;
 
 use App\Domain\DataTable\Repository\TableRecordRepository;
 use App\Entity\Abstract\AbstractUid;
+use App\Entity\Trait\TimestampTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
-use Symfony\Component\Serializer\Attribute\SerializedName;
 
 #[ORM\Entity(repositoryClass: TableRecordRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class TableRecord extends AbstractUid
 {
+    use TimestampTrait;
+
     /**
      * @var Collection<int, TableValue>
      */
