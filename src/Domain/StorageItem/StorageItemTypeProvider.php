@@ -20,7 +20,7 @@ readonly class StorageItemTypeProvider
     private array $factories;
 
     public function __construct(
-        private FileFactory               $fileFactory,
+        private FileFactory $fileFactory,
         private FolderFactory    $folderFactory,
         private DataTableFactory $dataTableFactory,
     )
@@ -32,16 +32,15 @@ readonly class StorageItemTypeProvider
         ];
     }
 
-    const DISCRIMINATOR_MAP = [
-        "file" => File::class,
-        "folder" => Folder::class,
-        "datatable" => DataTable::class,
-    ];
-
     const TYPES = [
         "file" => File::class,
         "folder" => Folder::class,
         "database" => DataTable::class,
+    ];
+
+    const TYPES_IN_FILESYSTEM = [
+        self::TYPES["file"],
+        self::TYPES["folder"]
     ];
 
 
@@ -53,5 +52,13 @@ readonly class StorageItemTypeProvider
             }
         }
         return null;
+    }
+
+    public static function isInFilesystem(StorageItemInterface $storageItem): bool
+    {
+        foreach (self::TYPES_IN_FILESYSTEM as $type) {
+            if ($storageItem instanceof $type) return true;
+        }
+        return false;
     }
 }

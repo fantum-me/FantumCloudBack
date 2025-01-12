@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: StorageItemRepository::class)]
 #[ORM\InheritanceType("JOINED")]
 #[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
-#[ORM\DiscriminatorMap(StorageItemTypeProvider::DISCRIMINATOR_MAP)]
+#[ORM\DiscriminatorMap(StorageItemTypeProvider::TYPES)]
 #[ORM\HasLifecycleCallbacks]
 abstract class StorageItem implements StorageItemInterface
 {
