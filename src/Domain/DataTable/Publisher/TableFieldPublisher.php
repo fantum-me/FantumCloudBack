@@ -10,7 +10,7 @@ use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Serializer\SerializerInterface;
 
-#[AsEntityListener(event: Events::prePersist, method: "prePersist", entity: TableField::class)]
+#[AsEntityListener(event: Events::postPersist, method: "postPersist", entity: TableField::class)]
 #[AsEntityListener(event: Events::preUpdate, method: "preUpdate", entity: TableField::class)]
 #[AsEntityListener(event: Events::preRemove, method: "preRemove", entity: TableField::class)]
 class TableFieldPublisher
@@ -22,7 +22,7 @@ class TableFieldPublisher
     {
     }
 
-    public function prePersist(TableField $field): void
+    public function postPersist(TableField $field): void
     {
         $update = new Update(
             "database-update/" . $field->getDataTable()->getId()->toRfc4122(),
