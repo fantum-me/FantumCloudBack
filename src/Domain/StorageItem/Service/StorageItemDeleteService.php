@@ -5,6 +5,7 @@ namespace App\Domain\StorageItem\Service;
 use App\Domain\File\File;
 use App\Domain\Folder\Folder;
 use App\Domain\StorageItem\StorageItemInterface;
+use App\Domain\StorageItem\StorageItemTypeProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -20,7 +21,7 @@ class StorageItemDeleteService
 
     public function deleteStorageItem(StorageItemInterface $item, $withFile = true): void
     {
-        if ($withFile) {
+        if ($withFile && StorageItemTypeProvider::isInFilesystem($item)) {
             $this->filesystem->remove($this->workspacePath . "/" . $item->getPath());
 
             if ($item instanceof File) {

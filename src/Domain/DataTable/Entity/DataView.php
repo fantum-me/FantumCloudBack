@@ -31,9 +31,10 @@ class DataView extends AbstractUid
     private ?string $type = null;
 
     #[ORM\Column(type: Types::JSON)]
+    #[ValidViewSettings]
     // Check getSerializedFieldSettings()
     #[Ignore]
-    private array $fieldSettings;
+    private array $settings;
 
     #[ORM\ManyToOne(inversedBy: 'views')]
     #[ORM\JoinColumn(nullable: false)]
@@ -48,7 +49,7 @@ class DataView extends AbstractUid
     public function __construct()
     {
         parent::__construct();
-        $this->fieldSettings = [];
+        $this->settings = [];
     }
 
 
@@ -76,26 +77,26 @@ class DataView extends AbstractUid
         return $this;
     }
 
-    public function getFieldSettings(): array
+    public function getSettings(): array
     {
-        return $this->fieldSettings;
+        return $this->settings;
     }
 
-    public function setFieldSettings(array $fieldSettings): static
+    public function setSettings(array $settings): static
     {
-        $this->fieldSettings = $fieldSettings;
+        $this->settings = $settings;
 
         return $this;
     }
 
     #[Groups(["default"])]
-    #[SerializedName("field_settings")]
+    #[SerializedName("settings")]
     #[Context([AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS => true])]
-    public function getSerializedFieldSettings(): object|array
+    public function getSerializedSettings(): object|array
     {
         // This ensure empty array serialized as json object
-        if (empty($this->fieldSettings)) return (object)[];
-        else return $this->fieldSettings;
+        if (empty($this->settings)) return (object)[];
+        else return $this->settings;
     }
 
 

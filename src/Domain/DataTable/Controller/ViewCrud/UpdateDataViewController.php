@@ -4,7 +4,6 @@ namespace App\Domain\DataTable\Controller\ViewCrud;
 
 use App\Domain\DataTable\Entity\DataTable;
 use App\Domain\DataTable\Entity\DataView;
-use App\Domain\DataTable\Service\DataViewSettingsService;
 use App\Domain\StorageItem\Service\StorageItemPermissionService;
 use App\Domain\User\User;
 use App\Domain\Workspace\Service\WorkspacePermissionService;
@@ -31,7 +30,6 @@ class UpdateDataViewController extends AbstractController
         #[MapEntity(id: 'database_id')] DataTable  $dataTable,
         DataView                                   $view,
         EntityManagerInterface                     $entityManager,
-        DataViewSettingsService                    $dataViewSettingsService,
         WorkspacePermissionService                 $workspacePermissionService,
         StorageItemPermissionService               $storageItemPermissionService,
         ValidatorInterface                         $validator
@@ -44,10 +42,8 @@ class UpdateDataViewController extends AbstractController
             $view->setName($name);
         }
 
-        if ($fieldSettings = RequestHandler::getRequestParameter($request, "field_settings")) {
-            if (is_array($fieldSettings) && $dataViewSettingsService->validateFieldSettings($view, $fieldSettings)) {
-                $view->setFieldSettings($fieldSettings);
-            } else throw new BadRequestHttpException("field_settings is invalid");
+        if ($settings = RequestHandler::getRequestParameter($request, "settings")) {
+            $view->setSettings($settings);
         }
 
         if (count($errors = $validator->validate($view)) > 0) {

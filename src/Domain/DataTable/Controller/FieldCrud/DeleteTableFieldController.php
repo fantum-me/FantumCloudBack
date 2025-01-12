@@ -36,10 +36,10 @@ class DeleteTableFieldController extends AbstractController
         if ($field->isTitle()) throw new AccessDeniedHttpException('Cannot delete title field.');
 
         foreach ($field->getDataTable()->getViews()->toArray() as $view) {
-            $settings = $view->getFieldSettings();
+            $settings = $view->getSettings();
             if (array_key_exists($field->getId()->toRfc4122(), $settings)) {
                 unset($settings[$field->getId()->toRfc4122()]);
-                $view->setFieldSettings($settings);
+                $view->setSettings($settings);
             }
         }
 
