@@ -11,7 +11,6 @@ use Symfony\Component\Mercure\Update;
  * This class is not an EntityListener.
  * It have to be called by controller.
  */
-
 class TableValuePublisher
 {
     public function __construct(
