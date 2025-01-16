@@ -17,4 +17,7 @@ enum DataViewFilterType: string
     case IsGreaterOrEqual = 'is_greater_or_equal';
     case IsLower = 'is_lower';
     case IsLowerOrEqual = 'is_lower_or_equal';
+
+    case IsBefore = 'is_before';
+    case IsAfter = 'is_after';
 }
