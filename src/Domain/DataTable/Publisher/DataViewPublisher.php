@@ -26,7 +26,7 @@ class DataViewPublisher
         $update = new Update(
             "database-update/" . $view->getDataTable()->getId()->toRfc4122(),
             json_encode([
-                "type" => "table_view_insert",
+                "type" => "database_view_insert",
                 "object" => $this->serializer->normalize($view)
             ]),
             private: true
@@ -40,7 +40,7 @@ class DataViewPublisher
         $update = new Update(
             "database-update/" . $view->getDataTable()->getId()->toRfc4122(),
             json_encode([
-                "type" => "table_view_update",
+                "type" => "database_view_update",
                 "object" => $this->serializer->normalize($view)
             ]),
             private: true
@@ -54,7 +54,7 @@ class DataViewPublisher
         $update = new Update(
             "database-update/" . $view->getDataTable()->getId()->toRfc4122(),
             json_encode([
-                "type" => "table_view_delete",
+                "type" => "database_view_delete",
                 "object" => ["id" => $view->getId()->toRfc4122()]
             ]),
             private: true
