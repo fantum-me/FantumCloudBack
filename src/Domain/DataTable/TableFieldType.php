@@ -8,6 +8,7 @@ enum TableFieldType: string
     case NumberType = "number";
     case BooleanType = "boolean";
     case SelectType = "select";
+    case MultiselectType = "multiselect";
     case DatetimeType = "datetime";
 }
 

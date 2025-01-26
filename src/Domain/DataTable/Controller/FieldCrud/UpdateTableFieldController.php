@@ -44,7 +44,7 @@ class UpdateTableFieldController extends AbstractController
             $field->setName($name);
         }
 
-        if ($field->getType() === TableFieldType::SelectType) {
+        if ($field->getType() === TableFieldType::SelectType || $field->getType() === TableFieldType::MultiselectType) {
             $options = RequestHandler::getRequestParameter($request, "options");
             if ($options) {
                 if (TableFieldTypeService::isValidOptionsArray($options)) $field->setOptions($options);
