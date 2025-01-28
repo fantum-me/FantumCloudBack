@@ -13,6 +13,10 @@ class ValidViewSettingsValidator extends ConstraintValidator
     public static function getArrayConstraint(): Assert\Collection
     {
         return new Assert\Collection([
+            'target_field' => [
+                new Assert\Type("string"),
+                new Assert\Length(["max" => 32])
+            ],
             'widths' => new Assert\Type("array"),
             'filters' => new Assert\Type("array")
         ], allowExtraFields: false, allowMissingFields: true);

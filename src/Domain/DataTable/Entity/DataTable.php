@@ -7,6 +7,7 @@ use App\Domain\StorageItem\StorageItem;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\OrderBy;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: DataTableRepository::class)]
@@ -31,6 +32,7 @@ class DataTable extends StorageItem
      * @var Collection<int, DataView>
      */
     #[ORM\OneToMany(mappedBy: 'dataTable', targetEntity: DataView::class, orphanRemoval: true)]
+    #[OrderBy(["created_at" => "ASC"])]
     #[Groups(["datatable_details"])]
     private Collection $views;
 
