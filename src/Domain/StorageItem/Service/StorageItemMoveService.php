@@ -19,10 +19,11 @@ class StorageItemMoveService
 
     public function moveStorageItem(StorageItemInterface $item, Folder $target): void
     {
-        $item->setFolder($target);
-
         if (StorageItemTypeProvider::isInFilesystem($item)) {
             $basePath = $item->getPath();
+            $previewBasePath = $item instanceof File ? $item->getPreviewPath() : null;
+
+            $item->setFolder($target);
 
             $this->filesystem->rename(
                 $this->workspacePath . "/" . $basePath,
@@ -30,7 +31,6 @@ class StorageItemMoveService
             );
 
             if ($item instanceof File) {
-                $previewBasePath = $item->getPreviewPath();
                 if ($this->filesystem->exists($this->workspacePath . "/" . $previewBasePath)) {
                     $this->filesystem->rename(
                         $this->workspacePath . "/" . $previewBasePath,
@@ -38,6 +38,8 @@ class StorageItemMoveService
                     );
                 }
             }
+        } else {
+            $item->setFolder($target);
         }
     }
 }
