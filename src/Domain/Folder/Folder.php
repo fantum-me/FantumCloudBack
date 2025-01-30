@@ -6,13 +6,11 @@ use App\Domain\StorageItem\StorageItem;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity]
 class Folder extends StorageItem
 {
     #[ORM\OneToMany(mappedBy: 'folder', targetEntity: StorageItem::class)]
-    #[Ignore]
     private Collection $items;
 
     public function __construct()

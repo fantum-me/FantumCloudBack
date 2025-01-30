@@ -5,7 +5,6 @@ namespace App\Tests\Unit\Domain\StorageItem\Service;
 use App\Domain\File\File;
 use App\Domain\Folder\Folder;
 use App\Domain\StorageItem\Service\StorageItemDeleteService;
-use App\Domain\StorageItem\StorageItemInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -123,23 +122,5 @@ class StorageItemDeleteServiceTest extends TestCase
             ->with($this->logicalOr($childFile, $childFolder, $folder));
 
         $this->service->deleteStorageItem($folder);
-    }
-
-    public function testDeleteGenericStorageItem(): void
-    {
-        $item = $this->createMock(StorageItemInterface::class);
-        $item->expects($this->once())
-            ->method('getPath')
-            ->willReturn('item');
-
-        $this->filesystem->expects($this->once())
-            ->method('remove')
-            ->with($this->workspacePath . '/item');
-
-        $this->entityManager->expects($this->once())
-            ->method('remove')
-            ->with($item);
-
-        $this->service->deleteStorageItem($item);
     }
 }

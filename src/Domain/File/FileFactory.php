@@ -4,13 +4,17 @@ namespace App\Domain\File;
 
 use App\Domain\File\Service\FilePreviewService;
 use App\Domain\Folder\Folder;
+use App\Domain\StorageItem\StorageItem;
+use App\Domain\StorageItem\StorageItemFactoryInterface;
+use App\Utils\RequestHandler;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class FileFactory
+class FileFactory implements StorageItemFactoryInterface
 {
     public function __construct(
         private readonly string                 $workspacePath,
@@ -21,6 +25,12 @@ class FileFactory
         private readonly FileSizeService        $fileSizeService
     )
     {
+    }
+
+    public function handleInsertRequest(Request $request, string $name, Folder $parent): StorageItem
+    {
+        $mime = RequestHandler::getRequestParameter($request, "mime", true);
+        return $this->createFile($name, $mime, $parent);
     }
 
     public function createFileFromUpload(UploadedFile $uploadedFile, Folder $targetFolder): File
@@ -62,5 +72,10 @@ class FileFactory
         $this->entityManager->persist($file);
 
         return $file;
+    }
+
+    public function getSupportedTypes(): array
+    {
+        return [File::class];
     }
 }

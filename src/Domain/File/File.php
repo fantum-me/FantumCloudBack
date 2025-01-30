@@ -13,7 +13,6 @@ class File extends StorageItem
 {
     #[ORM\Column(length: 255)]
     #[Assert\Regex("^[a-zA-Z]+\/[a-zA-Z0-9\-\.\+]+$^")]
-    #[Groups(["item_details"])]
     private ?string $mime = null;
 
     public function getPreviewPath(): ?string

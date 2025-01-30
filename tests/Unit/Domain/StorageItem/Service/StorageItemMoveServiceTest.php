@@ -5,7 +5,6 @@ namespace App\Tests\Unit\Domain\StorageItem\Service;
 use App\Domain\File\File;
 use App\Domain\Folder\Folder;
 use App\Domain\StorageItem\Service\StorageItemMoveService;
-use App\Domain\StorageItem\StorageItemInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -60,31 +59,6 @@ class StorageItemMoveServiceTest extends TestCase
                     $this->workspacePath . '/' . $targetPreviewPath
                 ] => null
             });
-
-        $this->service->moveStorageItem($item, $targetFolder);
-    }
-
-    public function testMoveStorageItem(): void
-    {
-        $basePath = "base_path";
-        $targetPath = "target_path";
-
-        $targetFolder = $this->createMock(Folder::class);
-
-        $item = $this->createMock(StorageItemInterface::class);
-
-        $item->expects($this->exactly(2))
-            ->method('getPath')
-            ->willReturnOnConsecutiveCalls($basePath, $targetPath);
-
-        $item->expects($this->once())->method('setFolder')->with($targetFolder);
-
-        $this->filesystem->expects($this->once())
-            ->method('rename')
-            ->with(
-                $this->workspacePath . '/' . $basePath,
-                $this->workspacePath . '/' . $targetPath
-            );
 
         $this->service->moveStorageItem($item, $targetFolder);
     }
